@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('ingredientes_receta', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('componente_id');
+            $table->foreign('componente_id')->references('id')->on('componentes')->onDelete('cascade');
+            $table->unsignedBigInteger('joya_id');
+            $table->foreign('joya_id')->references('id')->on('joyas')->onDelete('cascade');
+            $table->string('cantidad');
             $table->timestamps();
         });
     }

@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('rol_has_user', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('rol_id');
+            $table->foreign('rol_id')->references('id')->on('rol')->onDelete('cascade');
             $table->timestamps();
         });
     }

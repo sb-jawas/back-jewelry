@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('lote', function (Blueprint $table) {
             $table->id();
+            $table->string('ubi');
+            $table->string('observation');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('status_code_id');
+            $table->foreign('status_code_id')->references('id')->on('status_code')->onDelete('cascade');
             $table->timestamps();
         });
     }

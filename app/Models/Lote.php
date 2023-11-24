@@ -12,7 +12,6 @@ class Lote extends Model
     public $timestamps = true;
     
     protected $hidden = [
-        'created_at',
         'updated_at'
     ];
 
@@ -20,8 +19,10 @@ class Lote extends Model
         'ubi',
         'observation',
         'user_id',
+        'created_at',
         'status_code_id',
     ];
 
-    	
+
+
 }

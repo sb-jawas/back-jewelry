@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Rol>
  */
-class RolFactory extends Factory
+class ComponentesFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,7 +17,8 @@ class RolFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->name(),
+            'desc' => fake()->name(),
         ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lote;
+use App\Models\StatusCode;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -30,6 +32,7 @@ class UserController extends Controller
     public function show(string $id)
     {
         $user = User::find($id);
+
         return response()->json($user);
     }
 
@@ -47,5 +50,17 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+    
+    public function userLote(string $userId, string $loteId){
+        $user = User::find($userId);
+        $lote = Lote::where('user_id',$userId)->where('id',$loteId)->get();
+        return response()->json($lote);
+    }
+
+    public function userLotes(string $userId){
+        $user = User::find($userId);
+        $lote = Lote::where('user_id',$userId)->get();
+        return response()->json($lote);
     }
 }

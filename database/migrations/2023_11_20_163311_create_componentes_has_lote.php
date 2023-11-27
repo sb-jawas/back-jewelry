@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('componentes_has_lote', function (Blueprint $table) {
             $table->id();
             $table->integer('cantidad');
+            $table->unsignedBigInteger('clasificador_id');
+            $table->foreign('clasificador_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('lote_id');
             $table->foreign('lote_id')->references('id')->on('lote')->onDelete('cascade');
-            $table->unsignedBigInteger('componentes_id');
-            $table->foreign('componentes_id')->references('id')->on('componentes')->onDelete('cascade');
+            $table->unsignedBigInteger('componente_id');
+            $table->foreign('componente_id')->references('id')->on('componentes')->onDelete('cascade');
             $table->timestamps();
         });
     }

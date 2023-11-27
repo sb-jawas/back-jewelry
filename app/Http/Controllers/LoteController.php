@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lote;
+use App\Models\LoteDespiece;
 use App\Models\LoteUser;
 use App\Models\StatusCode;
 use App\Models\User;
@@ -105,5 +106,25 @@ class LoteController extends Controller
         $lote->status_code_id=2;
         $lote->save();
         return response()->json([$loteUser,$lote]);
+    }
+
+    public function clasficado(Request $req){
+        $arrIds = $req->get("id");
+        $arrCantidad =  $req->get("cantidad");
+        $loteId =  $req->get("lote_id");
+        $clasificador = $req->get("user_id");
+
+
+        $i = 0;
+        while($i<count($arrIds)){
+            $despiece = new LoteDespiece;
+            $despiece->cantidad =$arrCantidad[$i] ;
+            $despiece->clasificador_id = $clasificador ;
+            $despiece->lote_id = $loteId;
+            $despiece->componente_id = $arrIds[$i] ;
+            $despiece->save();
+            $i++;
+        }
+        return response()->json("despiece okey");
     }
 }

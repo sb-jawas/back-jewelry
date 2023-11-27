@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Lote;
 use App\Models\LoteUser;
+use App\Models\StatusCode;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class LoteController extends Controller
@@ -14,7 +16,30 @@ class LoteController extends Controller
     public function index()
     {
         $lotes = Lote::all();
-        return response()->json($lotes);
+        
+        $rtnMsg = [];
+        $i = 0;
+        
+        while($i<count($lotes)){
+
+            $status = StatusCode::find($lotes[$i]->status_code_id);
+            $user = User::find($lotes[$i]->user_id);
+
+            $arr = [
+            "id"=>$lotes[$i]->id,
+            "ubi"=>$lotes[$i]->ubi,
+            "observation"=>$lotes[$i]->observation,
+            "empresa"=>$user->name_empresa,
+            "status"=>$status->name,
+            "status_code_id"=>$status->status_code_id,
+            "created_at"=>$lotes[$i]->created_at];
+
+            $rtnMsg[] = $arr;
+            $i++;
+        }
+
+
+        return response()->json($rtnMsg);
     }
 
     /**
@@ -28,16 +53,30 @@ class LoteController extends Controller
         $lote->user_id=$req->get("user_id");
         $lote->status_code_id=1;
         $lote->save();
+
+        $lote->status = StatusCode::find($lote->status_code_id)->desc;
+
         return response()->json($lote);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($userId)
+    public function show($loteId)
     {
-        $lotes = Lote::where('user_id',$userId)->get();
-        return response()->json($lotes);
+        $lote = Lote::find($loteId);
+        $status = StatusCode::find($lote->status_code_id);
+        $user = User::find($lote->user_id);
+
+        $rtnObj = [
+            "id"=> $lote->id,
+            "user_id"=> $user->id,
+            "user_name"=> $user->name,
+            "ubi"=> $lote->ubi,
+            "observation"=> $lote->observation,
+            "status"=> $status->desc,
+            ] ;
+        return response()->json($rtnObj);
     }
 
     /**

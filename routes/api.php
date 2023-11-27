@@ -22,15 +22,56 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::get('/test',[testController::class,'index']);
+Route::group(['middleware' => ['cors']], function () {
 
-Route::get('/user/',[UserController::class,'index']);
-Route::get('/user/{id}',[UserController::class,'show']);
-Route::get('/lote/',[LoteController::class,'index']);
-Route::get('/lote/{userId}',[LoteController::class,'show']);
-Route::patch('/lote/{loteId}',[LoteController::class,'update']);
-Route::post('/lote',[LoteController::class,'store']);
-Route::post('/user/lote',[LoteController::class,'asignlote']);
 
-Route::get('/componentes',[ComponentesController::class,'index']);
+    Route::prefix('lote')->group(function () {
+        Route::controller(LoteController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::patch('/{loteId}', 'update');
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'destroy');
+        });
+    });
 
+    Route::prefix('user')->group(function () {
+        Route::controller(UserController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'destroy');
+
+            Route::prefix('{userId}/lote')->group(function () {
+                Route::get('/', 'userLotes');
+                Route::get('/{loteId}', 'userLote');
+                Route::put('/{id}', 'update');
+                Route::post('/', 'store');
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+    });
+
+    Route::prefix('componentes')->group(function () {
+        Route::controller(ComponentesController::class)->group(function () {
+
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'destroy');
+        });
+    });
+
+    Route::prefix('clasificacion')->group(function () {
+        Route::controller(ComponentesController::class)->group(function () {
+
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'destroy');
+        });
+    });
+});

@@ -28,6 +28,8 @@ class UserController extends Controller
             'start_at' => now(),
         ]);
 
-        return response()->json($user, 201);
+        $success['token'] = $user->createToken('hola')->plainTextToken;
+
+        return response()->json(["succes" => true, "data" =>$success, "message" => "user successfully registered!"] ); 
     }
 }

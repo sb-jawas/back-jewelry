@@ -19,6 +19,7 @@ class ComponentesFactory extends Factory
         return [
             'name' => fake()->name(),
             'desc' => fake()->name(),
+            'is_hardware' => 1,
         ];
     }
 }

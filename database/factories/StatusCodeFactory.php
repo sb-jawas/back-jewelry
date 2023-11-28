@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
-class ComponentesFactory extends Factory
+class StatusCodeFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,9 +17,7 @@ class ComponentesFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'desc' => fake()->name(),
-            'is_hardware' => 1,
+            //
         ];
     }
 }

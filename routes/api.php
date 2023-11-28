@@ -6,6 +6,7 @@ use App\Http\Controllers\testController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,4 +34,4 @@ Route::post('/lote',[LoteController::class,'store']);
 Route::post('/user/lote',[LoteController::class,'asignlote']);
 
 Route::get('/componentes',[ComponentesController::class,'index']);
-
+Route::post('/login', [AuthController::class, 'login']);

@@ -21,5 +21,7 @@ class Componentes extends Model
         'id',
         'name',
         'desc',
+        'is_hardware',
+        'created_user_id'
     ];
 }

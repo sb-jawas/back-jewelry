@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lote;
+use App\Models\StatusCode;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -32,5 +34,17 @@ class UserController extends Controller
         $success['token'] = $user->createToken('hola')->plainTextToken;
 
         return response()->json(["succes" => true, "data" =>$success, "message" => "user successfully registered!"] ); 
+    }
+    
+    public function userLote(string $userId, string $loteId){
+        $user = User::find($userId);
+        $lote = Lote::where('user_id',$userId)->where('id',$loteId)->get();
+        return response()->json($lote);
+    }
+
+    public function userLotes(string $userId){
+        $user = User::find($userId);
+        $lote = Lote::where('user_id',$userId)->get();
+        return response()->json($lote);
     }
 }

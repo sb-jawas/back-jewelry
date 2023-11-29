@@ -5,23 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Componentes extends Model
+class StatusCode extends Model
 {
     use HasFactory;
-
-    protected $table = 'componentes';
+    protected $table = 'status_code';
     public $timestamps = true;
     
     protected $hidden = [
-        'updated_at',
         'created_at',
+        'updated_at'
     ];
 
-    public $fillable = [
-        'id',
+    protected $fillable = [
         'name',
-        'desc',
-        'is_hardware',
-        'created_user_id'
+        'desc'
     ];
 }

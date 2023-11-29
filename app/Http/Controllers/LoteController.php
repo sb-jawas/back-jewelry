@@ -8,15 +8,44 @@ use App\Models\LoteUser;
 use App\Models\StatusCode;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class LoteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $req, $userId)
     {
-        $lotes = Lote::all();
+        $lotes = \DB::select("SELECT lote.id, lote.ubi, lote.observation, lote.user_id, lote.status_code_id, lote.created_at FROM lote JOIN lote_has_user ON lote.id = lote_has_user.lote_id where lote_has_user.user_id = ? and status_code_id = 2 GROUP by id",[$userId]);
+        // dd($lotes);
+        $rtnMsg = [];
+        $i = 0;
+        
+        while($i<count($lotes)){
+
+            $status = StatusCode::find($lotes[$i]->status_code_id);
+            $user = User::find($lotes[$i]->user_id);
+
+            $arr = [
+            "id"=>$lotes[$i]->id,
+            "ubi"=>$lotes[$i]->ubi,
+            "observation"=>$lotes[$i]->observation,
+            "empresa"=>$user->name_empresa,
+            "status"=>$status->name,
+            "status_code_id"=>$status->id,
+            "created_at"=>$lotes[$i]->created_at];
+
+            $rtnMsg[] = $arr;
+            $i++;
+        }
+
+
+        return response()->json($rtnMsg);
+    }
+    public function disponible()
+    {
+        $lotes = Lote::where('status_code_id',1)->get();
         
         $rtnMsg = [];
         $i = 0;
@@ -32,7 +61,7 @@ class LoteController extends Controller
             "observation"=>$lotes[$i]->observation,
             "empresa"=>$user->name_empresa,
             "status"=>$status->name,
-            "status_code_id"=>$status->status_code_id,
+            "status_code_id"=>$status->id,
             "created_at"=>$lotes[$i]->created_at];
 
             $rtnMsg[] = $arr;
@@ -98,14 +127,7 @@ class LoteController extends Controller
     }
 
     public function asignlote(Request $req){
-        $loteUser = new LoteUser;
-        $loteUser->user_id = $req->get("user_id");
-        $loteUser->lote_id = $req->get("lote_id") ;
-        $loteUser->save();
-        $lote = Lote::find($req->get("lote_id"));
-        $lote->status_code_id=2;
-        $lote->save();
-        return response()->json([$loteUser,$lote]);
+
     }
 
     public function clasficado(Request $req){
@@ -125,6 +147,7 @@ class LoteController extends Controller
             $despiece->save();
             $i++;
         }
-        return response()->json("despiece okey");
+        $rtnMsg = ["message"=>"Lote clasificado correctamente","despiece"=>$despiece];
+        return response()->json($rtnMsg);
     }
 }

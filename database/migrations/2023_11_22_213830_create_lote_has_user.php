@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lote_has_user', function (Blueprint $table) {
-            // $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('lote_id');
             $table->foreign('lote_id')->references('id')->on('lote')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->primary('lote_id');
             $table->timestamps();
         });
     }

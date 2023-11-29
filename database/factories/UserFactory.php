@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\RolUser;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -40,5 +41,18 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function configure(): static
+    {
+        return
+        $this
+        ->afterCreating(function ($user) {
+            $numRoles = rand(0,4);
+            RolUser::factory($numRoles)->create(['user_id' => $user->id, 'rol_id'=>rand(1,4)]);
+        })
+        ->afterMaking(function ($user) {
+           $user->save();
+        })        ;
     }
 }

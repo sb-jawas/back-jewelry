@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-            $table->date('start_at');
-            $table->date('end_at');
+            $table->date('start_at')->default('2023-01-01');
+            $table->date('end_at')->nullable();
         });
     }
 

@@ -4,48 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $user = User::all();
-        return response()->json($user);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
-    }
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $user = User::find($id);
-        return response()->json($user);
-    }
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $user = User::create([
+            'name' => $request->name,
+            'name_empresa' => $request->name_empresa,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'start_at' => now(),
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $success['token'] = $user->createToken('hola')->plainTextToken;
+
+        return response()->json(["succes" => true, "data" =>$success, "message" => "user successfully registered!"] ); 
     }
 }

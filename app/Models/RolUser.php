@@ -5,21 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LoteUser extends Model
+class RolUser extends Model
 {
     use HasFactory;
-    protected $table = 'lote_has_user';
-    
+    protected $table = 'rol_has_user';
     public $timestamps = true;
     
     protected $hidden = [
-        'updated_at',
         'created_at',
-        'id'
+        'updated_at'
     ];
 
     protected $fillable = [
+        'id',
         'user_id',
-        'lote_id'
+        'rol_id',
     ];
 }

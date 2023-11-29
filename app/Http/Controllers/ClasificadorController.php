@@ -8,9 +8,9 @@ use App\Models\StatusCode;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class LoteUserController extends Controller
+class ClasificadorController extends Controller
 {
-    /**
+        /**
      * Display a listing of the resource.
      */
     public function index()
@@ -23,7 +23,7 @@ class LoteUserController extends Controller
      */
     public function store(Request $req)
     {
-        $loteUser = new LoteUser;
+        $loteUser = new LoteUser();
         $loteUser->user_id = $req->get("user_id");
         $loteUser->lote_id = $req->get("lote_id");
         

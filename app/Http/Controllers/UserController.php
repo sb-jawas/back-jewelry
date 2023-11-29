@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lote;
+use App\Models\RolUser;
 use App\Models\StatusCode;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    public function roles($userId){
+        $user = RolUser::where('user_id',$userId)->get();
+        return response()->json($user);
+    }
     /**
      * Display a listing of the resource.
      */

@@ -94,6 +94,7 @@ class LoteController extends Controller
      */
     public function show($loteId)
     {
+        // dd("llego");
         $lote = Lote::find($loteId);
         $status = StatusCode::find($lote->status_code_id);
         $user = User::find($lote->user_id);
@@ -124,10 +125,6 @@ class LoteController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-
-    public function asignlote(Request $req){
-
     }
 
     public function clasficado(Request $req){

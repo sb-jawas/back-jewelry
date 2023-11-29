@@ -63,6 +63,11 @@ El usuario que se crea para poder iniciar sesión:
     'email' => 'fernando@cifp.com',
     'password' => "Chubaca2024",
 ```
+## Testing
+
+Hay test para probar:
+
+php artisan test
 
 ## EndPoints
 

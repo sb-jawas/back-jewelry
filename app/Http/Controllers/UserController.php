@@ -7,6 +7,8 @@ use App\Models\RolUser;
 use App\Models\StatusCode;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -28,33 +30,27 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $user = User::find($id);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
-        return response()->json($user);
-    }
+        $user = User::create([
+            'name' => $request->name,
+            'name_empresa' => $request->name_empresa,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'start_at' => now(),
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $success['token'] = $user->createToken('hola')->plainTextToken;
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json(["succes" => true, "data" =>$success, "message" => "user successfully registered!"] ); 
     }
     
     public function userLote(string $userId, string $loteId){

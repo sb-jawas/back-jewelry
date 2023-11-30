@@ -23,5 +23,29 @@ class AuthController extends Controller
         return response()->json($success);
     }
 
+    public function register(Request $request)
+{
+    // Validar los datos recibidos
+    $validatedData = $request->validate([
+        'name' => 'required|max:255',
+        'name_empresa' => 'required|max:255',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|min:6',
+    ]);
+
+    // Crear el usuario
+    $user = User::create([
+        'name' => $validatedData['name'],
+        'name_empresa' => $validatedData['name_empresa'],
+        'email' => $validatedData['email'],
+        'password' => Hash::make($validatedData['password']), // Encriptar la contraseña
+        'start_at' => now(),
+    ]);
+
+    // Respuesta con los datos del usuario
+    return response()->json(['user' => $user], 201);
+}
+
+
 
 }

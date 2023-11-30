@@ -21,7 +21,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->date('start_at');
-            $table->date('end_at');
+            $table->date('end_at')->nullable();
         });
     }
 

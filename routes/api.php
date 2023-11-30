@@ -35,3 +35,5 @@ Route::post('/user/lote',[LoteController::class,'asignlote']);
 
 Route::get('/componentes',[ComponentesController::class,'index']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/register', [AuthController::class, 'register']);

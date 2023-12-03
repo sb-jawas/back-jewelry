@@ -30,9 +30,17 @@ Route::group(['middleware' => ['cors']], function () {
         Route::controller(LoteController::class)->group(function () {
             Route::get('/disponibles', 'disponible');
             Route::get('/{loteId}', 'show');
+            Route::get('/{loteId}/rechazar', 'rechazar');
+            Route::post('{loteId}/clasificar', 'clasificar');
             Route::patch('/{loteId}', 'update');
             Route::post('/', 'store');
-            Route::post('/clasificador', 'clasficado');
+        });
+
+        Route::post('/clasificador', [LoteController::class,'clasficado']);
+
+
+        Route::controller(ClasificadorController::class)->group(function () {
+            Route::post('/asign/', 'store');
         });
     });
 

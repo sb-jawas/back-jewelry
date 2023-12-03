@@ -41,12 +41,16 @@ Route::group(['middleware' => ['cors']], function () {
             Route::get('/{id}/lotes', 'show');
             Route::post('/lote', 'store');
 Route::get('/componentes',[ComponentesController::class,'index']);
-Route::post('/login', [AuthController::class, 'login']);
-
-Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+});
+
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/register', [AuthController::class, 'register']);
+
+
 
 Route::post('/users', [UserController::class, 'store']);
     Route::prefix('user/lote')->group(function () {
@@ -88,3 +92,4 @@ Route::post('/users', [UserController::class, 'store']);
         });
     });
 });
+    });

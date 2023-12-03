@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lote;
+use App\Models\Rol;
 use App\Models\RolUser;
 use App\Models\StatusCode;
 use App\Models\User;
@@ -12,7 +13,19 @@ class UserController extends Controller
 {
     public function roles($userId){
         $user = RolUser::where('user_id',$userId)->get();
-        return response()->json($user);
+        
+        $rtnMsg = [];
+        $sizeRoles = count($user);
+        
+        for ($i=0; $i <  $sizeRoles ; $i++) {
+            
+            $rol = Rol::find($user[$i]->rol_id);
+
+            array_push($rtnMsg, $rol);
+        }
+        $code = 202;
+        
+        return response()->json($rtnMsg,$code);
     }
     /**
      * Display a listing of the resource.

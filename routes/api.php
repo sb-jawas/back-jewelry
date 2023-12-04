@@ -26,6 +26,7 @@ Route::group(['middleware' => ['cors']], function () {
 
     Route::get('empresa/mis-lotes/{userId}', [LoteController::class,'index']);
     Route::get('colaborador/mis-lotes/{userId}', [ClasificadorController::class,'index']);
+    Route::get('empresa/lote/{loteId}', [ClasificadorController::class,'infoDespiece']);
     
         /**
          * @author: badr

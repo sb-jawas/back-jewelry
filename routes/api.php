@@ -24,8 +24,9 @@ use App\Models\LoteUser;
 Route::group(['middleware' => ['cors']], function () {
 
 
-    Route::get('empresa/mis-lotes/', [LoteController::class,'index']);
-    Route::get('colaborador/mis-lotes/', [LoteUser::class,'index']);
+    Route::get('empresa/mis-lotes/{userId}', [LoteController::class,'index']);
+    Route::get('colaborador/mis-lotes/{userId}', [ClasificadorController::class,'index']);
+    
         /**
          * @author: badr
          * Rutas para CRUD lote.

@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CRUDController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,8 @@ use App\Http\Controllers\AuthController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::get('/getusers', [CRUDController::class, 'getUsers']);
 
 Route::group(['middleware' => ['cors']], function () {
 
@@ -54,9 +57,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 });
 
+
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/register', [AuthController::class, 'register']);
+
+Route::delete('/borrar/{id}', [CRUDController::class, 'userDelete']);
 
 
 

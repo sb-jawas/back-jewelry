@@ -13,22 +13,22 @@ class RolSeeder extends Seeder
     public function run(): void
     {
 
-        \App\Models\Rol::factory()->create([
+        \App\Models\Rol::create([
             'name' => 'Colaborador',
             'desc' => 'Usuario con capacidad de donar',
         ]);
         
-        \App\Models\Rol::factory()->create([
+        \App\Models\Rol::create([
             'name' => 'Clasificador',
             'desc' => 'Usuario con capacidad de gestionar lotes',
         ]);
 
-        \App\Models\Rol::factory()->create([
+        \App\Models\Rol::create([
             'name' => 'Diseñador',
             'desc' => 'Usuario con capacidad de crear joyas',
         ]);
 
-        \App\Models\Rol::factory()->create([
+        \App\Models\Rol::create([
             'name' => 'Admin',
             'desc' => 'Usuario con capacidad de gestionar de usuarios',
         ]);

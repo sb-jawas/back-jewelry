@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('componentes_has_lote', function (Blueprint $table) {
             $table->id();
             $table->integer('cantidad');
+            $table->string('observation')->nullable();
             $table->unsignedBigInteger('clasificador_id');
             $table->foreign('clasificador_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('lote_id');

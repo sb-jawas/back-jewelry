@@ -20,6 +20,7 @@ class LoteDespiece extends Model
         'cantidad',
         'clasificador_id',
         'lote_id',
-        'componente_id'
+        'componente_id',
+        'observation'
     ];
 }

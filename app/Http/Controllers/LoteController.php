@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventario;
 use App\Models\Lote;
 use App\Models\LoteDespiece;
 use App\Models\LoteUser;
 use App\Models\StatusCode;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\DB;
 
 class LoteController extends Controller
 {
@@ -17,7 +18,7 @@ class LoteController extends Controller
      */
     public function index(Request $req, $userId)
     {
-        $lotes = \DB::select("SELECT lote.id, lote.ubi, lote.observation, lote.user_id, lote.status_code_id, lote.created_at FROM lote JOIN lote_has_user ON lote.id = lote_has_user.lote_id where lote_has_user.user_id = ? and status_code_id = 2 GROUP by id",[$userId]);
+        $lotes = DB::select("SELECT lote.id, lote.ubi, lote.observation, lote.user_id, lote.status_code_id, lote.created_at FROM lote inner JOIN lote_has_user ON lote.id = lote_has_user.lote_id where lote_has_user.user_id = ? and status_code_id = 2 GROUP by id",[$userId]);
         // dd($lotes);
         $rtnMsg = [];
         $i = 0;
@@ -94,7 +95,7 @@ class LoteController extends Controller
      */
     public function show($loteId)
     {
-        // dd("llego");
+
         $lote = Lote::find($loteId);
         $status = StatusCode::find($lote->status_code_id);
         $user = User::find($lote->user_id);
@@ -106,6 +107,8 @@ class LoteController extends Controller
             "ubi"=> $lote->ubi,
             "observation"=> $lote->observation,
             "status"=> $status->desc,
+            "status_code"=> $status->id,
+
             ] ;
         return response()->json($rtnObj);
     }
@@ -127,11 +130,11 @@ class LoteController extends Controller
         //
     }
 
-    public function clasficado(Request $req){
+    public function clasificar(Request $req, $loteId){
         $arrIds = $req->get("id");
         $arrCantidad =  $req->get("cantidad");
-        $loteId =  $req->get("lote_id");
         $clasificador = $req->get("user_id");
+        $obs = $req->get("observation");
 
 
         $i = 0;
@@ -141,10 +144,29 @@ class LoteController extends Controller
             $despiece->clasificador_id = $clasificador ;
             $despiece->lote_id = $loteId;
             $despiece->componente_id = $arrIds[$i] ;
+            $despiece->observation = $obs[$i];
             $despiece->save();
+
+            $idInventario = Inventario::where('componente_id', $arrIds[$i])->get();
+            $addInventario = Inventario::find($idInventario[0]->id);
+            $addInventario->cantidad += $arrCantidad[$i];
+            $addInventario->save();
+
             $i++;
         }
+
+        $lote = Lote::find($loteId);
+        $lote->status_code_id = 5;
+        $lote->save();
+
         $rtnMsg = ["message"=>"Lote clasificado correctamente","despiece"=>$despiece];
         return response()->json($rtnMsg);
+    }
+
+    public function rechazar($id){
+        $lote = Lote::find($id);
+        $lote->status_code_id = 6;
+        $lote->save();
+        return response()->json($lote);
     }
 }

@@ -24,6 +24,8 @@ class Lote extends Model
         'status_code_id',
     ];
 
-
+    function statusLote(){
+        return $this->hasMany(StatusCode::class, 'id','status_code_id');
+    }
 
 }

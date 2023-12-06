@@ -16,7 +16,8 @@ class Lote extends Model
     ];
 
     protected $fillable = [
-        'ubi',
+        'lat',
+        'long',
         'observation',
         'user_id',
         'created_at',

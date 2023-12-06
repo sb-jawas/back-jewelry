@@ -154,28 +154,29 @@ class ClasificadorController extends Controller
      * Mostrar el despiece de un lote.
      */
 
-    public function infoDespiece($id)
+    public function infoDespiece(String $loteId)
     {
+        $vec = ["lote_id"  => $loteId];
 
-        $lote = Lote::find($id);
-        $idDespice = LoteDespiece::where('lote_id', $id)->get();
-        $arrDes = [];
-        $componentes = Componentes::all();
-        $i = 0;
-        while ($i < count($idDespice)) {
-            $despiece = LoteDespiece::find($idDespice[$i]->id);
-            $user = User::find($despiece->clasificador_id);
+        $message = [
+            "lote_id" => [
+                "exists" => "Este lote no existe",
+            ]
+        ];
 
-            $arrDes[] = [
-                "cantidad" => $despiece->cantidad,
-                "componente" => $componentes[$despiece->componente_id]->name,
-                "observation" => $despiece->observation,
-                "clasificador_id" => $user->name
-            ];
-            $i++;
+        $validator = Validator::make($vec, [
+            'lote_id' => 'required|exists:componentes_has_lote,lote_id',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
         }
 
-        return response()->json($arrDes);
+
+        $despiece = DB::select('select componentes_has_lote.cantidad as cantidad, componentes.name as componente, componentes_has_lote.observation, (select name from users where id = componentes_has_lote.clasificador_id) as "clasificador_id" from componentes_has_lote inner join lote on componentes_has_lote.lote_id = lote.id  inner join componentes on componentes_has_lote.componente_id = componentes.id  inner join users on users.id = lote.user_id where lote_id = ?', [$loteId]);
+        
+
+        return response()->json($despiece, 200);
     }
 
     private function saveLote($loteId, $userId)

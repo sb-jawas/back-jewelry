@@ -25,9 +25,7 @@ use App\Http\Controllers\Lotes\LoteController;
 Route::group(['middleware' => ['cors']], function () {
 
 
-    Route::get('empresa/lote/{loteId}', [ClasificadorController::class, 'infoDespiece']);
-    Route::get('empresa/mis-lotes/{userId}', [LoteController::class, 'index']);
-    Route::put('empresa/mis-lotes/{userId}/cancelar', [LoteController::class, 'cancelar']);
+    Route::get('info-despiece/{loteId}', [ClasificadorController::class, 'infoDespiece']);
 
     Route::prefix('colaborador')->group(function () {
         Route::controller(ColaboradorController::class)->group(function () {
@@ -58,44 +56,35 @@ Route::group(['middleware' => ['cors']], function () {
         });
     });
 
-    Route::prefix('user')->group(function () {
-        Route::controller(ClasificadorController::class)->group(function () {
-            Route::post('{userId}/asign', 'store');
+
+    Route::post('/login', [AuthController::class, 'login']);
+
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::controller(UserController::class)->group(function () {
+        Route::get('/{id}/mis-roles', 'roles');
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::post('/', 'store');
+        Route::delete('/{id}', 'destroy');
+
+        Route::prefix('{userId}/lote')->group(function () {
+            Route::controller(LoteController::class)->group(function () {
+                Route::get('/', 'show');
+            });
         });
+    });
 
-
-        Route::controller(ClasificadorController::class)->group(function () {
-            Route::get('/{id}/lotes', 'show');
-            Route::post('/lote', 'store');
-        });
-
-        Route::controller(ComponentesController::class)->group(function () {
+    Route::controller(ComponentesController::class)->group(function () {
+        Route::prefix('user')->group(function () {
             Route::get('{userId}/componentes', 'index');
             Route::get('{userId}/componentes/{id}', 'show');
             Route::put('{userId}/componentes/{id}', 'update');
             Route::post('componete', 'store');
             Route::delete('{userId}/componentes/{id}', 'destroy');
-        });
-
-        Route::post('/login', [AuthController::class, 'login']);
-
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-            return $request->user();
-        });
-        Route::controller(UserController::class)->group(function () {
-            Route::get('/{id}/mis-roles', 'roles');
-            Route::get('/', 'index');
-            Route::get('/{id}', 'show');
-            Route::put('/{id}', 'update');
-            Route::post('/', 'store');
-            Route::delete('/{id}', 'destroy');
-
-            Route::prefix('{userId}/lote')->group(function () {
-                Route::controller(LoteController::class)->group(function () {
-                    Route::get('/', 'show');
-                });
-            });
         });
     });
 
@@ -107,16 +96,3 @@ Route::group(['middleware' => ['cors']], function () {
         Route::delete('/componentes/{id}', 'destroy');
     });
 });
-
-
-    // Route::post('/users', [UserController::class, 'store']);
-    // Route::prefix('user/lote')->group(function () {
-    //     Route::controller(LoteUserController::class)->group(function () {
-    //         Route::get('/', 'index');
-    //         Route::get('/{id}', 'show');
-    //         Route::patch('/{loteId}', 'update');
-    //         Route::post('/', 'store');
-    //         Route::delete('/{id}', 'destroy');
-    //     });
-    // });
-// });

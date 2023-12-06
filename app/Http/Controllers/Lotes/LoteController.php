@@ -75,7 +75,7 @@ class LoteController extends Controller
         $lote->status_code_id = 1;
         $lote->save();
 
-        // $lote->status = StatusCode::find($lote->status_code_id)->desc;
+        $lote->status = StatusCode::find($lote->status_code_id)->desc;
 
         return $lote;
     }
@@ -182,15 +182,5 @@ class LoteController extends Controller
 
         return response()->json($lote, 200);
     }
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 
-    
-
-    
 }

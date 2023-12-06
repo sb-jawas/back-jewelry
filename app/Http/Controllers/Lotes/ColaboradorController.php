@@ -61,7 +61,8 @@ class ColaboradorController extends Controller
         if($showLote == null){
             $statusCode = 404;
         };
-        return response()->json($showLote, $statusCode);
+
+        return response()->json($showLote[0], $statusCode);
     }
 
     public function store(Request $req){
@@ -84,7 +85,7 @@ class ColaboradorController extends Controller
         ], $messages);
 
         if($validator->fails()){
-            return response()->json($validator->errors(),202);
+            return response()->json($validator->errors(),400);
         }
 
         $newLote = LoteController::store($req);

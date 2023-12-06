@@ -90,7 +90,7 @@ class ClasificadorController extends Controller
         $lote = $req->get("lote_id");
 
         if (count($req->get("lote_id")) == 1) {
-            $this->saveLote($req, 0, $userId);
+            $this->saveLote($req->get("lote_id")[0], $userId);
         } else {
             $i = 0;
             while ($i < count($req->get("lote_id"))) {

@@ -111,8 +111,11 @@ class ClasificadorController extends Controller
     public function show(string $loteId)
     {
         $lote = LoteController::show($loteId);
-
-        return response()->json($lote);
+        $statusCode = 200;
+        if(!empty($lote->messages())){
+            $statusCode = 404;
+        }
+        return response()->json($lote,$statusCode);
     }
 
     /**

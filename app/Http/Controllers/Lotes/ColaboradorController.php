@@ -53,15 +53,16 @@ class ColaboradorController extends Controller
         ], $messages);
 
         if($validator->fails()){
-            return response()->json($validator->errors(),202);
+            return response()->json($validator->errors(),404);
         }
 
-        $showLote = DB::select("select * from lote where id = ? and user_id = ?",[$loteId, $userId]);
+        $showLote = DB::select('select lote.id, lote.lat, lote.long, lote.observation, lote.status_code_id as "status_code", status_code.name as "status",lote.created_at from lote inner join status_code on status_code.id = lote.status_code_id where lote.id = ? and user_id = ?',[$loteId, $userId]);
         $statusCode = 200;
         if($showLote == null){
-            $statusCode = 204;
+            $statusCode = 404;
         };
-        return response()->json($showLote, $statusCode);
+
+        return response()->json($showLote[0], $statusCode);
     }
 
     public function store(Request $req){
@@ -84,7 +85,7 @@ class ColaboradorController extends Controller
         ], $messages);
 
         if($validator->fails()){
-            return response()->json($validator->errors(),202);
+            return response()->json($validator->errors(),400);
         }
 
         $newLote = LoteController::store($req);

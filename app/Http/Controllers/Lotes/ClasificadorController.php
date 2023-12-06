@@ -15,14 +15,18 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Rules\HasPermission;
 
+/**
+ * @author: badr => @bhamidou
+ */
+
 class ClasificadorController extends Controller
 {
-        /**
-     * Display a listing of the resource.
+    /**
+     * Para obtener los lotes pendientes de clasificar.
      */
-    public function index($id)
+    public function index(String $userId)
     {
-        $vec = ["user_id"  => $id];
+        $vec = ["user_id"  => $userId];
         $validator = Validator::make($vec, [
             'user_id' => 'required|exists:lote_has_user,user_id',
         ]);
@@ -33,22 +37,22 @@ class ClasificadorController extends Controller
             return response()->json($rtnObj, 404);
         }
 
-
-        $lotes = LoteUser::where('user_id',$id)->get();
-
-        $i = 0;
-        while($i<count($lotes)){
-            $status = StatusCode::find($lotes[$i]->status_code_id);
-            $user = User::find($lotes[$i]->user_id);
-            $rtnObj = $this->rtnShowLote($lotes[$i], $user, $status);
-            $rtnLotes[] = $rtnObj;
-            $i++;
-            
-        }
-            $statusCode = 200;
+        $lotes = DB::select('select lote.id, users.name_empresa, lote.created_at from lote_has_user inner join lote on lote.id = lote_has_user.lote_id inner join users on lote.user_id = users.id where lote_has_user.user_id = ? and lote.status_code_id = 3', [$userId]);
     
-        return response()->json($rtnLotes, $statusCode);
+        return response()->json($lotes);
     }
+
+    /**
+     * Para obtener la lista de lotes disponibles para asignarse.
+     */
+
+    public function disponible()
+    {
+        $lotes = DB::select('select lote.id, users.name_empresa as "empresa", lote.created_at, status_code.name as "status" from lote inner join users on users.id = lote.user_id inner join status_code on status_code.id = lote.status_code_id where lote.status_code_id = 3');
+
+        return response()->json($lotes);
+    }
+
 
     /**
      * Store a newly created resource in storage.

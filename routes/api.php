@@ -40,22 +40,19 @@ Route::group(['middleware' => ['cors']], function () {
 
     Route::prefix('clasificador')->group(function () {
         Route::controller(ClasificadorController::class)->group(function () {
-            Route::get('/disponibles', 'disponible');
-            Route::get('/{loteId}', 'show');
-            Route::get('/{loteId}/rechazar', 'rechazar');
-            Route::post('{loteId}/clasificar', 'clasificar');
-            Route::patch('/{loteId}', 'update');
-            Route::post('/', 'store');
+            Route::get('lotes', 'todos');
+            Route::get('disponibles', 'disponible');
+            Route::get('{userId}/mis-lotes', 'index');
+            Route::get('{userId}/mis-clasificados', 'clasificados');
+            Route::get('lote/{loteId}', 'show');
+            Route::patch('{userId}/rechazar', 'rechazar');
+            Route::put('{userId}/clasificar', 'clasificar');
         });
     });
 
     Route::prefix('lote')->group(function () {
         Route::controller(LoteController::class)->group(function () {
-            Route::get('/disponibles', 'disponible');
             Route::get('/{loteId}', 'show');
-            Route::get('/{loteId}/rechazar', 'rechazar');
-            Route::post('{loteId}/clasificar', 'clasificar');
-            Route::patch('/{loteId}', 'update');
             Route::post('/', 'store');
         });
     });

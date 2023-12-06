@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Lotes;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Componentes;
 use App\Models\Lote;
 use App\Models\LoteDespiece;
 use App\Models\LoteUser;
 use App\Models\StatusCode;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -19,9 +20,34 @@ class ClasificadorController extends Controller
         /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($id)
     {
-        //
+        $vec = ["user_id"  => $id];
+        $validator = Validator::make($vec, [
+            'user_id' => 'required|exists:lote_has_user,user_id',
+        ]);
+
+        if ($validator->fails()) {
+            $rtnObj = ["msg"=>"No tienes lotes"];
+
+            return response()->json($rtnObj, 404);
+        }
+
+
+        $lotes = LoteUser::where('user_id',$id)->get();
+
+        $i = 0;
+        while($i<count($lotes)){
+            $status = StatusCode::find($lotes[$i]->status_code_id);
+            $user = User::find($lotes[$i]->user_id);
+            $rtnObj = $this->rtnShowLote($lotes[$i], $user, $status);
+            $rtnLotes[] = $rtnObj;
+            $i++;
+            
+        }
+            $statusCode = 200;
+    
+        return response()->json($rtnLotes, $statusCode);
     }
 
     /**
@@ -152,7 +178,8 @@ class ClasificadorController extends Controller
             "id"=> $lote->id,
             "user_id"=> $user->id,
             "empresa"=> $user->name,
-            "ubi"=> $lote->ubi,
+            "lat"=> $lote->lat,
+            "long"=> $lote->long,
             "observation"=> $lote->observation,
             "status"=> $status->desc,
             "created_at"=>$lote->created_at

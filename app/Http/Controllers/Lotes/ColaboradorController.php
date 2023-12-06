@@ -64,10 +64,32 @@ class ColaboradorController extends Controller
         return response()->json($showLote, $statusCode);
     }
 
-    public function store(){
-        
+    public function store(Request $req){
+        $messages = [
+            'user_id' => [
+                'required' => 'Es obligatorio el usuario'
+            ],
+            'ubi' => [
+                'required' => 'Es obligatorio la ubicación'
+            ],
+            'observation' => [
+                'required' => 'Es obligatorio la observación'
+            ],
+        ];
+        $validator = Validator::make($req->all(), [
+            'ubi' => 'required',
+            'observation' => 'required',
+            'user_id'  => 'required|exists:users,id'
 
-        return response()->json("funca");
+        ], $messages);
+
+        if($validator->fails()){
+            return response()->json($validator->errors(),202);
+        }
+
+        $newLote = LoteController::store($req);
+
+        return response()->json($newLote);
     }
 
     public function rechazar(String $loteId){

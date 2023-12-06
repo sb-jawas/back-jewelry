@@ -92,7 +92,7 @@ class LoteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $req)
+    static function store(Request $req)
     {
         $lote = new Lote;
         $lote->lat=$req->get("ubi")[0];
@@ -102,9 +102,9 @@ class LoteController extends Controller
         $lote->status_code_id=1;
         $lote->save();
 
-        $lote->status = StatusCode::find($lote->status_code_id)->desc;
+        // $lote->status = StatusCode::find($lote->status_code_id)->desc;
 
-        return response()->json($lote);
+        return $lote;
     }
 
     /**

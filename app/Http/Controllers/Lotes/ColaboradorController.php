@@ -92,9 +92,48 @@ class ColaboradorController extends Controller
         return response()->json($newLote);
     }
 
-    public function rechazar(String $loteId){
-       
+    public function cancelar(Request $req, String $loteId){
 
-        return response()->json("funciona");
+        $vecValidator = [
+            "user_id"=> $req->get("user_id"),
+            "lote_id"=> $loteId
+        ];
+
+        $messages = [
+                "user_id" => [
+                    "required"=>"Es necesario un usuario",
+                    "exists"=>"Este usuario no existe",
+                ],
+                "lote_id" => [
+                    "required"=>"Es necesario el id del lote",
+                    "exists"=>"Este lote no exite",
+                ]
+        ];
+
+        $validator = Validator::make($vecValidator, [
+            'user_id' => 'required|exists:users,id',
+            'lote_id' => 'required|exists:lote,id',
+        ], $messages);
+
+        if($validator->fails() ){
+            return response()->json($validator->errors(), 400);
+        }
+        $lote = Lote::find($loteId);
+        
+        $check = true;
+        if($lote->user_id == $req->get("user_id")){
+            $check = false;
+        }
+        if ($check) {
+            $rtnObj = ["msg"=>"No es posible cancelar un lote que no ha creado"];
+
+            return response()->json($rtnObj, 404);
+        }
+
+        $lote->status_code_id = 7;
+
+        $lote->save();
+
+        return response()->json($lote, 200);
     }
 }

@@ -34,7 +34,7 @@ Route::group(['middleware' => ['cors']], function () {
             Route::get('{userId}/mis-lotes', 'index');
             Route::get('{userId}/lote/{loteId}', 'show');
             Route::post('lote', 'store');
-            Route::patch('lote/{loteId}', 'rechazar');
+            Route::patch('lote/{loteId}', 'cancelar');
         });
     });
 

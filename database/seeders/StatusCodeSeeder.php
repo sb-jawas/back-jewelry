@@ -41,5 +41,9 @@ class StatusCodeSeeder extends Seeder
             'name' => 'Rechazado',
             'desc' => 'Este lote no contiene lo necesario para poder crear una joya',
         ]);
+        \App\Models\StatusCode::factory()->create([
+            'name' => 'Cancelado',
+            'desc' => 'Este lote ha sido cancelado por el cliente',
+        ]);
     }
 }

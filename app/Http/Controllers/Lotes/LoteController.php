@@ -192,11 +192,5 @@ class LoteController extends Controller
 
     
 
-    public function rechazar($id)
-    {
-        $lote = Lote::find($id);
-        $lote->status_code_id = 6;
-        $lote->save();
-        return response()->json($lote);
-    }
+    
 }

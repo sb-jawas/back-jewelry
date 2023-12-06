@@ -184,4 +184,12 @@ class ClasificadorController extends Controller
         $rtnMsg = ["message" => "Lote clasificado correctamente", "despiece" => $despiece];
         return response()->json($rtnMsg);
     }
+
+    public function rechazar($id)
+    {
+        $lote = Lote::find($id);
+        $lote->status_code_id = 6;
+        $lote->save();
+        return response()->json($lote);
+    }
 }

@@ -27,59 +27,32 @@ class LoteController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $rtnObj = ["msg"=>"No tienes lotes"];
+            $rtnObj = ["msg" => "No tienes lotes"];
 
             return response()->json($rtnObj, 404);
         }
         // $lotes = DB::select("SELECT lote.id, lote.ubi, lote.observation, lote.user_id, lote.status_code_id, lote.created_at FROM lote inner JOIN lote_has_user ON lote.id = lote_has_user.lote_id where lote_has_user.user_id = ? and status_code_id = 2 GROUP by id",[$userId]);
-        $lotes = Lote::where("user_id",$userId)->get();
+        $lotes = Lote::where("user_id", $userId)->get();
         // dd($lotes);
-        
+
         $rtnMsg = [];
         $i = 0;
-        
-        while($i<count($lotes)){
+
+        while ($i < count($lotes)) {
 
             $status = StatusCode::find($lotes[$i]->status_code_id);
             $user = User::find($lotes[$i]->user_id);
 
             $arr = [
-            "id"=>$lotes[$i]->id,
-            "lat"=>$lotes[$i]->lat,
-            "long"=>$lotes[$i]->long,
-            "observation"=>$lotes[$i]->observation,
-            "empresa"=>$user->name_empresa,
-            "status"=>$status->name,
-            "status_code_id"=>$status->id,
-            "created_at"=>$lotes[$i]->created_at];
-
-            $rtnMsg[] = $arr;
-            $i++;
-        }
-
-
-        return response()->json($rtnMsg);
-    }
-    public function disponible()
-    {
-        $lotes = Lote::where('status_code_id',1)->get();
-        
-        $rtnMsg = [];
-        $i = 0;
-        
-        while($i<count($lotes)){
-
-            $status = StatusCode::find($lotes[$i]->status_code_id);
-            $user = User::find($lotes[$i]->user_id);
-
-            $arr = [
-            "id"=>$lotes[$i]->id,
-            "ubi"=>$lotes[$i]->ubi,
-            "observation"=>$lotes[$i]->observation,
-            "empresa"=>$user->name_empresa,
-            "status"=>$status->name,
-            "status_code_id"=>$status->id,
-            "created_at"=>$lotes[$i]->created_at];
+                "id" => $lotes[$i]->id,
+                "lat" => $lotes[$i]->lat,
+                "long" => $lotes[$i]->long,
+                "observation" => $lotes[$i]->observation,
+                "empresa" => $user->name_empresa,
+                "status" => $status->name,
+                "status_code_id" => $status->id,
+                "created_at" => $lotes[$i]->created_at
+            ];
 
             $rtnMsg[] = $arr;
             $i++;
@@ -95,11 +68,11 @@ class LoteController extends Controller
     static function store(Request $req)
     {
         $lote = new Lote;
-        $lote->lat=$req->get("ubi")[0];
-        $lote->long=$req->get("ubi")[1];
-        $lote->observation=$req->get("observation");
-        $lote->user_id=$req->get("user_id");
-        $lote->status_code_id=1;
+        $lote->lat = $req->get("ubi")[0];
+        $lote->long = $req->get("ubi")[1];
+        $lote->observation = $req->get("observation");
+        $lote->user_id = $req->get("user_id");
+        $lote->status_code_id = 1;
         $lote->save();
 
         // $lote->status = StatusCode::find($lote->status_code_id)->desc;
@@ -110,25 +83,44 @@ class LoteController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($loteId)
+    static function show($loteId)
     {
+        $vec = ["lote_id"  => $loteId];
+
+        $message = [
+            "lote_id" => [
+                "required" => "Es necesario el ID lote",
+                "exists" => "Este lote no existe",
+
+            ]
+        ];
+
+        $validator = Validator::make($vec, [
+            'lote_id' => 'required|exists:lote,id',
+        ], $message);
+
+        if ($validator->fails()) {
+            return $validator->errors();
+        }
 
         $lote = Lote::find($loteId);
         $status = StatusCode::find($lote->status_code_id);
         $user = User::find($lote->user_id);
 
         $rtnObj = [
-            "id"=> $lote->id,
-            "user_id"=> $user->id,
-            "user_name"=> $user->name,
-            "lat"=>$lote->lat,
-            "long"=>$lote->long,
-            "observation"=> $lote->observation,
-            "status"=> $status->desc,
-            "status_code"=> $status->id,
+            "id" => $lote->id,
+            "user_id" => $user->id,
+            "user_name" => $user->name,
+            "lat" => $lote->lat,
+            "long" => $lote->long,
+            "observation" => $lote->observation,
+            "status" => $status->desc,
+            "status_code" => $status->id,
 
-            ] ;
-        return response()->json($rtnObj);
+        ];
+
+
+        return $rtnObj;
     }
 
     /**
@@ -145,7 +137,8 @@ class LoteController extends Controller
      * Esta función servirá para cancelar el lote que crea una empresa.
      */
 
-     public function cancelar(Request $req, $userId){
+    public function cancelar(Request $req, $userId)
+    {
 
         $vec = [
             "user_id"  => $userId,
@@ -153,14 +146,14 @@ class LoteController extends Controller
         ];
 
         $messages = [
-                "user_id" => [
-                    "required"=>"Es necesario un usuario",
-                    "exists"=>"Este usuario no existe",
-                ],
-                "lote_id" => [
-                    "required"=>"Es necesario el id del lote",
-                    "exists"=>"Este lote no exite",
-                ]
+            "user_id" => [
+                "required" => "Es necesario un usuario",
+                "exists" => "Este usuario no existe",
+            ],
+            "lote_id" => [
+                "required" => "Es necesario el id del lote",
+                "exists" => "Este lote no exite",
+            ]
         ];
 
         $validator = Validator::make($vec, [
@@ -168,17 +161,17 @@ class LoteController extends Controller
             'lote_id' => 'required|exists:lote,id',
         ], $messages);
 
-        if($validator->fails() ){
+        if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
         $lote = Lote::find($req->get("lote_id"));
-        
+
         $check = true;
-        if($lote->user_id == $userId){
+        if ($lote->user_id == $userId) {
             $check = false;
         }
         if ($check) {
-            $rtnObj = ["msg"=>"No es posible cancelar un lote que no ha creado"];
+            $rtnObj = ["msg" => "No es posible cancelar un lote que no ha creado"];
 
             return response()->json($rtnObj, 404);
         }
@@ -188,10 +181,7 @@ class LoteController extends Controller
         $lote->save();
 
         return response()->json($lote, 200);
-
-
-
-     }
+    }
     /**
      * Remove the specified resource from storage.
      */
@@ -200,7 +190,8 @@ class LoteController extends Controller
         //
     }
 
-    public function clasificar(Request $req, $loteId){
+    public function clasificar(Request $req, $loteId)
+    {
         $arrIds = $req->get("id");
         $arrCantidad =  $req->get("cantidad");
         $clasificador = $req->get("user_id");
@@ -208,12 +199,12 @@ class LoteController extends Controller
 
 
         $i = 0;
-        while($i<count($arrIds)){
+        while ($i < count($arrIds)) {
             $despiece = new LoteDespiece;
-            $despiece->cantidad =$arrCantidad[$i] ;
-            $despiece->clasificador_id = $clasificador ;
+            $despiece->cantidad = $arrCantidad[$i];
+            $despiece->clasificador_id = $clasificador;
             $despiece->lote_id = $loteId;
-            $despiece->componente_id = $arrIds[$i] ;
+            $despiece->componente_id = $arrIds[$i];
             $despiece->observation = $obs[$i];
             $despiece->save();
 
@@ -229,11 +220,12 @@ class LoteController extends Controller
         $lote->status_code_id = 5;
         $lote->save();
 
-        $rtnMsg = ["message"=>"Lote clasificado correctamente","despiece"=>$despiece];
+        $rtnMsg = ["message" => "Lote clasificado correctamente", "despiece" => $despiece];
         return response()->json($rtnMsg);
     }
 
-    public function rechazar($id){
+    public function rechazar($id)
+    {
         $lote = Lote::find($id);
         $lote->status_code_id = 6;
         $lote->save();

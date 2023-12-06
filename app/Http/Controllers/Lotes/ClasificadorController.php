@@ -9,6 +9,7 @@ use App\Models\Inventario;
 use App\Models\Lote;
 use App\Models\LoteDespiece;
 use App\Models\LoteUser;
+use App\Models\StatusCode;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -110,12 +111,43 @@ class ClasificadorController extends Controller
      */
     public function show(string $loteId)
     {
-        $lote = LoteController::show($loteId);
-        $statusCode = 200;
-        if(!empty($lote->messages())){
-            $statusCode = 404;
+        $vec = ["lote_id"  => $loteId];
+
+        $message = [
+            "lote_id" => [
+                "required" => "Es necesario el ID lote",
+                "exists" => "Este lote no existe",
+
+            ]
+        ];
+
+        $validator = Validator::make($vec, [
+            'lote_id' => 'required|exists:lote,id',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
         }
-        return response()->json($lote,$statusCode);
+
+        $lote = Lote::find($loteId);
+        $status = StatusCode::find($lote->status_code_id);
+        $user = User::find($lote->user_id);
+
+        $rtnObj = [
+            "id" => $lote->id,
+            "user_id" => $user->id,
+            "user_name" => $user->name,
+            "lat" => $lote->lat,
+            "long" => $lote->long,
+            "observation" => $lote->observation,
+            "status" => $status->desc,
+            "status_code" => $status->id,
+
+        ];
+
+
+        return $rtnObj;
+        return response()->json($lote,200);
     }
 
     /**
@@ -188,9 +220,9 @@ class ClasificadorController extends Controller
         return response()->json($rtnMsg);
     }
 
-    public function rechazar($id)
+    public function rechazar(String $loteId)
     {
-        $lote = Lote::find($id);
+        $lote = Lote::find($loteId);
         $lote->status_code_id = 6;
         $lote->save();
         return response()->json($lote);

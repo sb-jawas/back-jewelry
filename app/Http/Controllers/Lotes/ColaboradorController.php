@@ -33,9 +33,35 @@ class ColaboradorController extends Controller
         return response()->json($lotesUser,200);
     }
 
-    public function show(String $loteId){
-       
-        return response()->json("funciona");
+    public function show(String $userId,String $loteId){
+        $vecValidator = [
+            "user_id"=>$userId,
+            "lote_id"=>$loteId
+        ];
+        $messages = [
+            'user_id' => [
+                'exists' => 'Este usuario no existe'
+            ],
+            'lote_id' => [
+                'exists' => 'Este lote no existe'
+            ],
+        ];
+        $validator = Validator::make($vecValidator, [
+            'user_id' => 'exists:users,id',
+            'lote_id' => 'exists:lote,id',
+
+        ], $messages);
+
+        if($validator->fails()){
+            return response()->json($validator->errors(),202);
+        }
+
+        $showLote = DB::select("select * from lote where id = ? and user_id = ?",[$loteId, $userId]);
+        $statusCode = 200;
+        if($showLote == null){
+            $statusCode = 204;
+        };
+        return response()->json($showLote, $statusCode);
     }
 
     public function store(){

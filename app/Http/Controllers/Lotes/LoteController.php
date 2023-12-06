@@ -190,39 +190,7 @@ class LoteController extends Controller
         //
     }
 
-    public function clasificar(Request $req, $loteId)
-    {
-        $arrIds = $req->get("id");
-        $arrCantidad =  $req->get("cantidad");
-        $clasificador = $req->get("user_id");
-        $obs = $req->get("observation");
-
-
-        $i = 0;
-        while ($i < count($arrIds)) {
-            $despiece = new LoteDespiece;
-            $despiece->cantidad = $arrCantidad[$i];
-            $despiece->clasificador_id = $clasificador;
-            $despiece->lote_id = $loteId;
-            $despiece->componente_id = $arrIds[$i];
-            $despiece->observation = $obs[$i];
-            $despiece->save();
-
-            $idInventario = Inventario::where('componente_id', $arrIds[$i])->get();
-            $addInventario = Inventario::find($idInventario[0]->id);
-            $addInventario->cantidad += $arrCantidad[$i];
-            $addInventario->save();
-
-            $i++;
-        }
-
-        $lote = Lote::find($loteId);
-        $lote->status_code_id = 5;
-        $lote->save();
-
-        $rtnMsg = ["message" => "Lote clasificado correctamente", "despiece" => $despiece];
-        return response()->json($rtnMsg);
-    }
+    
 
     public function rechazar($id)
     {

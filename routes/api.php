@@ -45,8 +45,9 @@ Route::group(['middleware' => ['cors']], function () {
             Route::get('{userId}/mis-lotes', 'index');
             Route::get('{userId}/mis-clasificados', 'clasificados');
             Route::get('lote/{loteId}', 'show');
-            Route::patch('{userId}/rechazar', 'rechazar');
-            Route::put('{userId}/clasificar', 'clasificar');
+            Route::post('{userId}/asign', 'store');
+            Route::patch('{loteId}/rechazar', 'rechazar');
+            Route::put('{loteId}/clasificar', 'clasificar');
         });
     });
 

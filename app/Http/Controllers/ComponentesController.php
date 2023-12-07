@@ -50,28 +50,7 @@ class ComponentesController extends Controller
      */
     public function store(Request $req)
     {
-        $message =[
-            'created_user_id' =>[
-                "required" => "Es necesario el usuario",
-                "exists" => "Este usuario no existe"
-            ],
-            'name' => [
-                "required" => "Es necesario un nombre",
-                "min" => "Como mínimo se permite un solo caracter",
-                "max" => "Como máximo solo se permite 30 caracteres",
-
-            ],
-            'desc' => [
-                "required" => "Es necesaria una descripción",
-                "min" => "Como mínimo se permite un solo caracter",
-                "max" => "Como máximo solo se permite 255 caracteres",
-            ],
-            'is_hardware' => [
-                "required" => "Es necesario indicar si es de tipo hardware o no",
-                "integer" => "Tiene que ser un número entero",
-                "between" => "Solo se permite 0 ó 1",
-            ],
-        ];
+        $message = $this->validatorMessages();
         $validator = Validator::make($req->all(), [
             'created_user_id' => 'required|exists:users,id',
             'name' => 'required|min:1|max:30',
@@ -154,16 +133,67 @@ class ComponentesController extends Controller
     /**
      * Actualiza un componente en especifico.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $req, string $componenteId)
     {
+        $vecValidator = [
+            "componente_id" => $componenteId,
+            "name" => $req->get("name"),
+            "desc" => $req->get("desc"),
+            "is_hardware" => $req->get("is_hardware")
+
+        ];
+        $message = $this->validatorMessages();
+        ;
+        $validator = Validator::make($vecValidator, [
+            'componente_id' => 'required|exists:componentes,id',
+            'name' => 'required|min:1|max:30',
+            'desc' => 'required|min:1|max:255',
+            'is_hardware' => 'required|integer|between:0,1',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $componente = Componentes::find($componenteId)->update($vecValidator);
+
+        $componente = Componentes::find($componenteId);
+
+        return response()->json($componente,200);
         
     }
+
 
     /**
      * Elimina un componente de un usuario
      */
-    public function destroy(string $componenteId)
+    public function destroy(Request $req, string $componenteId)
     {
         
+    }
+
+    private function validatorMessages(){
+        return [
+            'created_user_id' =>[
+                "required" => "Es necesario el usuario",
+                "exists" => "Este usuario no existe"
+            ],
+            'name' => [
+                "required" => "Es necesario un nombre",
+                "min" => "Como mínimo se permite un solo caracter",
+                "max" => "Como máximo solo se permite 30 caracteres",
+
+            ],
+            'desc' => [
+                "required" => "Es necesaria una descripción",
+                "min" => "Como mínimo se permite un solo caracter",
+                "max" => "Como máximo solo se permite 255 caracteres",
+            ],
+            'is_hardware' => [
+                "required" => "Es necesario indicar si es de tipo hardware o no",
+                "integer" => "Tiene que ser un número entero",
+                "between" => "Solo se permite 0 ó 1",
+            ],
+        ];
     }
 }

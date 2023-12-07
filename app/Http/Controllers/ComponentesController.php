@@ -145,17 +145,38 @@ class ComponentesController extends Controller
         $message = $this->validatorMessages();
         ;
         $validator = Validator::make($vecValidator, [
-            'componente_id' => 'required|exists:componentes,id',
-            'name' => 'required|min:1|max:30',
-            'desc' => 'required|min:1|max:255',
-            'is_hardware' => 'required|integer|between:0,1',
+            'componente_id' => 'exists:componentes,id',
+            'name' => 'max:30',
+            'desc' => 'max:255',
+            'is_hardware' => 'integer|between:0,1',
         ], $message);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(),404);
         }
 
-        $componente = Componentes::find($componenteId)->update($req->all());
+        $componente = Componentes::where('id',$componenteId)->get();
+
+        $i = 0;
+        $vecDatos = ["name", "desc","is_hardware"];
+        $t = $req->all();
+        $size = count($t);
+        $arrVec = [];
+        while($i<$size){
+            if($t[$vecDatos[$i]] != null){
+                if($vecDatos[$i] == "is_hardware"){
+                    $arrVec[$vecDatos[$i]] = intval($t[$vecDatos[$i]]);
+                }else{
+                    $arrVec[$vecDatos[$i]] = $t[$vecDatos[$i]];
+                }
+                
+            }else{
+                $arrVec[$vecDatos[$i]] = $componente[0][$vecDatos[$i]];
+            }
+            $i++;
+        }
+
+        $componente = Componentes::find($componenteId)->update($arrVec);
 
         $componente = Componentes::find($componenteId);
 

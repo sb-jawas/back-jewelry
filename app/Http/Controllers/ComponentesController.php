@@ -90,26 +90,80 @@ class ComponentesController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Muestra un componente en específico.
      */
-    public function show(string $id)
+    public function show(string $componenteId)
     {
-        //
+        
+        $vecValidator = ["componente_id" => $componenteId];
+        $message = [
+            "componente_id" => [
+                "required" => "Es necesario el ID componente",
+                "exists" => "Este componente no existe",
+            ]
+        ];
+        $validator = Validator::make($vecValidator, [
+            'componente_id' => 'required|exists:componentes,id',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $componente = Componentes::find($componenteId);
+        return response()->json($componente);
+
+    }
+
+    public function showByUser(String $userId, String $componenteId)
+    {
+        
+        $vecValidator = [
+            "componente_id" => $componenteId,
+            "user_id" => $userId
+        ];
+        $message = [
+            "componente_id" => [
+                "required" => "Es necesario el ID componente",
+                "exists" => "Este componente no existe",
+            ],
+            "user_id" => [
+                "required" => "Es necesario el ID del usuario"
+            ]
+        ];
+        $validator = Validator::make($vecValidator, [
+            'componente_id' => 'required|exists:componentes,id',
+            'user_id' => 'required',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?',[$userId, $componenteId]);
+        
+        if(!empty($compByUser[0])){
+            $componente = Componentes::find($componenteId);
+            return response()->json($componente);
+        }else{
+            return response()->json(["msg"=>"Este componente no te pertenece"],404);
+        }
+
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualiza un componente en especifico.
      */
     public function update(Request $request, string $id)
     {
-        //
+        
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Elimina un componente de un usuario
      */
-    public function destroy(string $id)
+    public function destroy(string $componenteId)
     {
-        //
+        
     }
 }

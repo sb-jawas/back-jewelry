@@ -33,14 +33,15 @@ class ComponentesController extends Controller
         ], $message);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(),404);
+            return response()->json($validator->errors(), 404);
         }
 
         $componentes = DB::select('select * from componentes where created_user_id = ?', [$userId]);
         return response()->json($componentes);
     }
 
-    public function allComponentes(){
+    public function allComponentes()
+    {
         $componentes = Componentes::all();
         return response()->json($componentes);
     }
@@ -60,12 +61,11 @@ class ComponentesController extends Controller
         ], $message);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(),404);
+            return response()->json($validator->errors(), 404);
         }
 
         $componente = Componentes::create($req->all());
         return response()->json($componente);
-
     }
 
     /**
@@ -73,7 +73,7 @@ class ComponentesController extends Controller
      */
     public function show(string $componenteId)
     {
-        
+
         $vecValidator = ["componente_id" => $componenteId];
         $message = [
             "componente_id" => [
@@ -86,17 +86,16 @@ class ComponentesController extends Controller
         ], $message);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(),404);
+            return response()->json($validator->errors(), 404);
         }
 
         $componente = Componentes::find($componenteId);
         return response()->json($componente);
-
     }
 
     public function showByUser(String $userId, String $componenteId)
     {
-        
+
         $vecValidator = [
             "componente_id" => $componenteId,
             "user_id" => $userId
@@ -116,18 +115,17 @@ class ComponentesController extends Controller
         ], $message);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(),404);
+            return response()->json($validator->errors(), 404);
         }
 
-        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?',[$userId, $componenteId]);
-        
-        if(!empty($compByUser[0])){
+        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?', [$userId, $componenteId]);
+
+        if (!empty($compByUser[0])) {
             $componente = Componentes::find($componenteId);
             return response()->json($componente);
-        }else{
-            return response()->json(["msg"=>"Este componente no te pertenece"],404);
+        } else {
+            return response()->json(["msg" => "Este componente no te pertenece"], 404);
         }
-
     }
 
     /**
@@ -142,25 +140,50 @@ class ComponentesController extends Controller
             "is_hardware" => $req->get("is_hardware")
 
         ];
-        $message = $this->validatorMessages();
-        ;
+        $message = $this->validatorMessages();;
         $validator = Validator::make($vecValidator, [
-            'componente_id' => 'required|exists:componentes,id',
-            'name' => 'required|min:1|max:30',
-            'desc' => 'required|min:1|max:255',
-            'is_hardware' => 'required|integer|between:0,1',
+            'componente_id' => 'exists:componentes,id',
+            'name' => 'max:30',
+            'desc' => 'max:255',
+            'is_hardware' => 'integer|between:0,1',
         ], $message);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(),404);
+            return response()->json($validator->errors(), 404);
         }
 
-        $componente = Componentes::find($componenteId)->update($req->all());
+        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?', [$req->get("user_id"), $componenteId]);
+        $isAdmin = DB::select('select rol_id from componentes inner join rol_has_user on componentes.created_user_id = rol_has_user.user_id where created_user_id = ? and rol_id = 4', [$req->get("user_id")]);
 
-        $componente = Componentes::find($componenteId);
+        if (!empty($isAdmin) || !empty($compByUser[0])) {
+            $componente = Componentes::where('id', $componenteId)->get();
 
-        return response()->json($componente,200);
-        
+            $i = 0;
+            $vecDatos = ["name", "desc", "is_hardware"];
+            $t = $req->all();
+            $t["is_hardware"] = strval($t["is_hardware"]);
+            $size = count($t);
+            $arrVec = [];
+            while ($i < $size) {
+                if ($t[$vecDatos[$i]] != null) {
+                    if ($vecDatos[$i] == "is_hardware") {
+                        $arrVec[$vecDatos[$i]] = intval($t[$vecDatos[$i]]);
+                    } else {
+                        $arrVec[$vecDatos[$i]] = $t[$vecDatos[$i]];
+                    }
+                } else {
+                    $arrVec[$vecDatos[$i]] = $componente[0][$vecDatos[$i]];
+                }
+                $i++;
+            }
+            $componente = Componentes::find($componenteId)->update($arrVec);
+
+            $componente = Componentes::find($componenteId);
+
+            return response()->json($componente, 200);
+        } else {
+            return response()->json(["msg" => "Este componente no te pertenece"], 404);
+        }
     }
 
 
@@ -189,24 +212,24 @@ class ComponentesController extends Controller
         ], $message);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(),404);
+            return response()->json($validator->errors(), 404);
         }
 
-        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?',[$req->get("user_id"), $componenteId]);
+        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?', [$req->get("user_id"), $componenteId]);
         $isAdmin = DB::select('select rol_id from componentes inner join rol_has_user on componentes.created_user_id = rol_has_user.user_id where created_user_id = ? and rol_id = 4', [$req->get("user_id")]);
 
-        if(!empty($compByUser[0] || !empty($isAdmin))){
+        if (!empty($isAdmin) || !empty($compByUser[0])) {
             Componentes::destroy($componenteId);
-            return response()->json(["msg"=>"Componente eliminado correctamente"],200);
-        }else{
-            return response()->json(["msg"=>"Este componente no te pertenece"],404);
+            return response()->json(["msg" => "Componente eliminado correctamente"], 200);
+        } else {
+            return response()->json(["msg" => "Este componente no te pertenece"], 404);
         }
-
     }
 
-    private function validatorMessages(){
+    private function validatorMessages()
+    {
         return [
-            'created_user_id' =>[
+            'created_user_id' => [
                 "required" => "Es necesario el usuario",
                 "exists" => "Este usuario no existe"
             ],

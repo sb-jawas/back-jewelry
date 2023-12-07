@@ -160,6 +160,7 @@ class ComponentesController extends Controller
         $i = 0;
         $vecDatos = ["name", "desc","is_hardware"];
         $t = $req->all();
+        $t["is_hardware"] = strval($t["is_hardware"]);
         $size = count($t);
         $arrVec = [];
         while($i<$size){
@@ -216,7 +217,7 @@ class ComponentesController extends Controller
         $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?',[$req->get("user_id"), $componenteId]);
         $isAdmin = DB::select('select rol_id from componentes inner join rol_has_user on componentes.created_user_id = rol_has_user.user_id where created_user_id = ? and rol_id = 4', [$req->get("user_id")]);
 
-        if(!empty($compByUser[0] || !empty($isAdmin))){
+        if(!empty($isAdmin) || !empty($compByUser[0])){
             Componentes::destroy($componenteId);
             return response()->json(["msg"=>"Componente eliminado correctamente"],200);
         }else{

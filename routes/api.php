@@ -51,8 +51,6 @@ Route::group(['middleware' => ['cors']], function () {
         Route::controller(ComponentesController::class)->group(function () {
             Route::get('{userId}/componentes', 'index');
             Route::get('{userId}/componentes/{componenteId}', 'showByUser');
-            Route::patch('{userId}/componentes/{componenteId}', 'updateByUser');
-            Route::delete('{userId}/componentes/{componenteId}', 'destroyByUser');
         });
     });
 

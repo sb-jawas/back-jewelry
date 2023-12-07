@@ -155,7 +155,7 @@ class ComponentesController extends Controller
             return response()->json($validator->errors(),404);
         }
 
-        $componente = Componentes::find($componenteId)->update($vecValidator);
+        $componente = Componentes::find($componenteId)->update($req->all());
 
         $componente = Componentes::find($componenteId);
 
@@ -169,7 +169,38 @@ class ComponentesController extends Controller
      */
     public function destroy(Request $req, string $componenteId)
     {
-        
+        $vecValidator = [
+            "componente_id" => $componenteId,
+            "user_id" => $req->get("user_id")
+        ];
+        $message = [
+            "componente_id" => [
+                "required" => "Es necesario el ID componente",
+                "exists" => "Este componente no existe",
+            ],
+            "user_id" => [
+                "required" => "Es necesario el ID del usuario",
+                "exists" => "Este usuario no existe",
+            ]
+        ];
+        $validator = Validator::make($vecValidator, [
+            'componente_id' => 'required|exists:componentes,id',
+            'user_id' => 'required|exists:users,id',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?',[$req->get("user_id"), $componenteId]);
+
+        if(!empty($compByUser[0])){
+            $componente = Componentes::destroy($componenteId);
+            return response()->json($componente);
+        }else{
+            return response()->json(["msg"=>"Este componente no te pertenece"],404);
+        }
+
     }
 
     private function validatorMessages(){

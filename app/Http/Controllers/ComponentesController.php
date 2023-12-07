@@ -4,47 +4,228 @@ namespace App\Http\Controllers;
 
 use App\Models\Componentes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
+/**
+ * @author: badr => @bhamidou
+ */
 
 class ComponentesController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Mostrar todos los componentes en función del usuario.
      */
-    public function index()
+    public function index(String $userId)
     {
+        $vecValidator = [
+            "user_id" => $userId
+        ];
+
+        $message = [
+            "user_id" => [
+                "exists" => "Este usuario no existe",
+            ]
+        ];
+
+        $validator = Validator::make($vecValidator, [
+            'user_id' => 'exists:users,id',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $componentes = DB::select('select * from componentes where created_user_id = ?', [$userId]);
+        return response()->json($componentes);
+    }
+
+    public function allComponentes(){
         $componentes = Componentes::all();
         return response()->json($componentes);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Crear un nuevo componente.
      */
-    public function store(Request $request)
+    public function store(Request $req)
     {
-        //
+        $message = $this->validatorMessages();
+        $validator = Validator::make($req->all(), [
+            'created_user_id' => 'required|exists:users,id',
+            'name' => 'required|min:1|max:30',
+            'desc' => 'required|min:1|max:255',
+            'is_hardware' => 'required|integer|between:0,1',
+
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $componente = Componentes::create($req->all());
+        return response()->json($componente);
+
     }
 
     /**
-     * Display the specified resource.
+     * Muestra un componente en específico.
      */
-    public function show(string $id)
+    public function show(string $componenteId)
     {
-        //
+        
+        $vecValidator = ["componente_id" => $componenteId];
+        $message = [
+            "componente_id" => [
+                "required" => "Es necesario el ID componente",
+                "exists" => "Este componente no existe",
+            ]
+        ];
+        $validator = Validator::make($vecValidator, [
+            'componente_id' => 'required|exists:componentes,id',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $componente = Componentes::find($componenteId);
+        return response()->json($componente);
+
+    }
+
+    public function showByUser(String $userId, String $componenteId)
+    {
+        
+        $vecValidator = [
+            "componente_id" => $componenteId,
+            "user_id" => $userId
+        ];
+        $message = [
+            "componente_id" => [
+                "required" => "Es necesario el ID componente",
+                "exists" => "Este componente no existe",
+            ],
+            "user_id" => [
+                "required" => "Es necesario el ID del usuario"
+            ]
+        ];
+        $validator = Validator::make($vecValidator, [
+            'componente_id' => 'required|exists:componentes,id',
+            'user_id' => 'required',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?',[$userId, $componenteId]);
+        
+        if(!empty($compByUser[0])){
+            $componente = Componentes::find($componenteId);
+            return response()->json($componente);
+        }else{
+            return response()->json(["msg"=>"Este componente no te pertenece"],404);
+        }
+
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualiza un componente en especifico.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $req, string $componenteId)
     {
-        //
+        $vecValidator = [
+            "componente_id" => $componenteId,
+            "name" => $req->get("name"),
+            "desc" => $req->get("desc"),
+            "is_hardware" => $req->get("is_hardware")
+
+        ];
+        $message = $this->validatorMessages();
+        ;
+        $validator = Validator::make($vecValidator, [
+            'componente_id' => 'required|exists:componentes,id',
+            'name' => 'required|min:1|max:30',
+            'desc' => 'required|min:1|max:255',
+            'is_hardware' => 'required|integer|between:0,1',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $componente = Componentes::find($componenteId)->update($req->all());
+
+        $componente = Componentes::find($componenteId);
+
+        return response()->json($componente,200);
+        
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Elimina un componente de un usuario
      */
-    public function destroy(string $id)
+    public function destroy(Request $req, string $componenteId)
     {
-        //
+        $vecValidator = [
+            "componente_id" => $componenteId,
+            "user_id" => $req->get("user_id")
+        ];
+        $message = [
+            "componente_id" => [
+                "required" => "Es necesario el ID componente",
+                "exists" => "Este componente no existe",
+            ],
+            "user_id" => [
+                "required" => "Es necesario el ID del usuario",
+                "exists" => "Este usuario no existe",
+            ]
+        ];
+        $validator = Validator::make($vecValidator, [
+            'componente_id' => 'required|exists:componentes,id',
+            'user_id' => 'required|exists:users,id',
+        ], $message);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),404);
+        }
+
+        $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?',[$req->get("user_id"), $componenteId]);
+        $isAdmin = DB::select('select rol_id from componentes inner join rol_has_user on componentes.created_user_id = rol_has_user.user_id where created_user_id = ? and rol_id = 4', [$req->get("user_id")]);
+
+        if(!empty($compByUser[0] || !empty($isAdmin))){
+            Componentes::destroy($componenteId);
+            return response()->json(["msg"=>"Componente eliminado correctamente"],200);
+        }else{
+            return response()->json(["msg"=>"Este componente no te pertenece"],404);
+        }
+
+    }
+
+    private function validatorMessages(){
+        return [
+            'created_user_id' =>[
+                "required" => "Es necesario el usuario",
+                "exists" => "Este usuario no existe"
+            ],
+            'name' => [
+                "required" => "Es necesario un nombre",
+                "min" => "Como mínimo se permite un solo caracter",
+                "max" => "Como máximo solo se permite 30 caracteres",
+
+            ],
+            'desc' => [
+                "required" => "Es necesaria una descripción",
+                "min" => "Como mínimo se permite un solo caracter",
+                "max" => "Como máximo solo se permite 255 caracteres",
+            ],
+            'is_hardware' => [
+                "required" => "Es necesario indicar si es de tipo hardware o no",
+                "integer" => "Tiene que ser un número entero",
+                "between" => "Solo se permite 0 ó 1",
+            ],
+        ];
     }
 }

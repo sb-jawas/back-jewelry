@@ -205,14 +205,22 @@ class ClasificadorController extends Controller
             $despiece->observation = $obs[$i];
             $despiece->save();
 
-            $idInventario = Inventario::where('componente_id', $arrIds[$i])->get();
-            $addInventario = Inventario::find($idInventario[0]->id);
-            $addInventario->cantidad += $arrCantidad[$i];
-            $addInventario->save();
+            $inventario = DB::select('select id from inventario where componente_id = ? ',[$despiece->componente_id]);
 
+            if($inventario == null){
+                $newInventario = new Inventario;
+                $newInventario->cantidad = $despiece->cantidad;
+                $newInventario->componente_id = $despiece->componente_id;
+                $newInventario->save();
+            }else{
+                $updateInventario = Inventario::find($inventario[0]->id);
+                $updateInventario->cantidad += $despiece->cantidad;
+                $updateInventario->save();
+            }
+            
             $i++;
         }
-
+        
         $lote = Lote::find($loteId);
         $lote->status_code_id = 5;
         $lote->save();

@@ -47,6 +47,21 @@ Route::group(['middleware' => ['cors']], function () {
             Route::patch('{loteId}/rechazar', 'rechazar');
             Route::put('{loteId}/clasificar', 'clasificar');
         });
+
+        Route::controller(ComponentesController::class)->group(function () {
+            Route::get('{userId}/componentes', 'index');
+            Route::get('{userId}/componentes/{componenteId}', 'showByUser');
+        });
+    });
+
+    Route::controller(ComponentesController::class)->group(function () {
+        Route::prefix("componentes")->group(function () {
+            Route::get('/', 'allComponentes');
+            Route::get('{componenteId}', 'show');
+            Route::patch('{componenteId}', 'update');
+            Route::post('', 'store');
+            Route::delete('{componenteId}', 'destroy');
+        });
     });
 
     Route::prefix('lote')->group(function () {
@@ -77,22 +92,6 @@ Route::group(['middleware' => ['cors']], function () {
             });
         });
     });
-
-    Route::controller(ComponentesController::class)->group(function () {
-        Route::prefix('user')->group(function () {
-            Route::get('{userId}/componentes', 'index');
-            Route::get('{userId}/componentes/{id}', 'show');
-            Route::put('{userId}/componentes/{id}', 'update');
-            Route::post('componete', 'store');
-            Route::delete('{userId}/componentes/{id}', 'destroy');
-        });
-    });
-
-    Route::controller(ComponentesController::class)->group(function () {
-        Route::get('/componentes', 'index');
-        Route::get('/componentes/{id}', 'show');
-        Route::put('/componentes/{id}', 'update');
-        Route::post('componete', 'store');
-        Route::delete('/componentes/{id}', 'destroy');
-    });
+    
+    
 });

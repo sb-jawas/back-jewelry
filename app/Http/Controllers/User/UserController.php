@@ -9,6 +9,8 @@ use App\Models\RolUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+
 
 /**
  * @author: badr => @bhamidou
@@ -90,11 +92,30 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Muestra la información de un usuario en concreto.
      */
-    public function show(string $id)
+    public function show(Request $req, string $userId)
     {
-        //
+        $vecValidator = [
+            "user_id" => $userId,
+        ];
+        $messages = [
+            'user_id' => [
+                'exists' => 'Este usuario no existe'
+            ]
+        ];
+    
+        $validator = Validator::make($vecValidator, [
+            'user_id' => 'exists:users,id',
+        ], $messages);
+    
+        if ($validator->fails()) {
+            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+        }
+        
+        $user = User::find($userId);
+        return response()->json(["msg" => $user, "status"=>200], 200);
+
     }
 
     /**

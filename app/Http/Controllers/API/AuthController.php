@@ -64,7 +64,7 @@ class AuthController extends Controller
         ], $messages);
     
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors()], 400);
+            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
         }
     
         $input = $request->all();
@@ -79,7 +79,7 @@ class AuthController extends Controller
 
         $rolUser = RolUser::create($vecUserRol);
 
-        return response()->json([ "user" => [$user, $rolUser], "msg" => "Usuario registrado"]);
+        return response()->json([ "user" => [$user, $rolUser], "msg" => "Usuario registrado", "status"=>200],200);
     }
 
     public function logout(Request $request)

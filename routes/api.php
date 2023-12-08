@@ -31,7 +31,13 @@ Route::group(['middleware' => ['cors']], function () {
         Route::post('full-logout','fullLogout');
     });
 
+    Route::get('', function () {
+        return response()->json("Unauthorized",401);
+    })->name('nologin');
+    
 
+    Route::middleware('auth:sanctum')->group(function () {
+        
     Route::get('info-despiece/{loteId}', [ClasificadorController::class, 'infoDespiece']);
 
     Route::prefix('colaborador')->group(function () {
@@ -77,6 +83,7 @@ Route::group(['middleware' => ['cors']], function () {
             Route::post('/', 'store');
         });
     });
+});
 
 
     // Route::post('/login', [AuthController::class, 'login']);

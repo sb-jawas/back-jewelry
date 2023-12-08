@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\API\AuthController as APIAuthController;
 use App\Http\Controllers\ComponentesController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -23,6 +23,13 @@ use App\Http\Controllers\Lotes\LoteController;
 */
 
 Route::group(['middleware' => ['cors']], function () {
+
+    Route::controller(APIAuthController::class)->group(function(){
+        Route::post('signup','signup');
+        Route::post('login','login');
+        Route::post('logout','logout');
+        Route::post('full-logout','fullLogout');
+    });
 
 
     Route::get('info-despiece/{loteId}', [ClasificadorController::class, 'infoDespiece']);
@@ -72,26 +79,26 @@ Route::group(['middleware' => ['cors']], function () {
     });
 
 
-    Route::post('/login', [AuthController::class, 'login']);
+    // Route::post('/login', [AuthController::class, 'login']);
 
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-        return $request->user();
-    });
-    Route::controller(UserController::class)->group(function () {
-        Route::get('/{id}/mis-roles', 'roles');
-        Route::get('/', 'index');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::post('/', 'store');
-        Route::delete('/{id}', 'destroy');
+    // Route::post('/register', [AuthController::class, 'register']);
+    // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    //     return $request->user();
+    // });
+    // Route::controller(UserController::class)->group(function () {
+    //     Route::get('/{id}/mis-roles', 'roles');
+    //     Route::get('/', 'index');
+    //     Route::get('/{id}', 'show');
+    //     Route::put('/{id}', 'update');
+    //     Route::post('/', 'store');
+    //     Route::delete('/{id}', 'destroy');
 
-        Route::prefix('{userId}/lote')->group(function () {
-            Route::controller(LoteController::class)->group(function () {
-                Route::get('/', 'show');
-            });
-        });
-    });
+    //     Route::prefix('{userId}/lote')->group(function () {
+    //         Route::controller(LoteController::class)->group(function () {
+    //             Route::get('/', 'show');
+    //         });
+    //     });
+    // });
     
     
 });

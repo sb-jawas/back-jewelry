@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Str;
 
 
 /**
@@ -56,12 +56,9 @@ class UserController extends Controller
             'email.required' => 'El campo email es obligatorio.',
             'email.email' => 'El campo email debe ser una dirección de correo válida.',
             'email.unique' => 'El email ya está registrado.',
-            'password.required' => 'La contraseña es obligatorio.',
             'name_empresa.required' => 'El nombre de empresa es obligatorio',
             'name_empresa.unique' => 'El nombre de la empresa ya está en uso',
-            'start_at.required' => 'La fecha para dar de alta es obligatoria',
             'start_at.date' => 'No es una fecha',
-            'end_at.required' => 'La fecha para dar de baja es obligatoria',
             'end_at.date' => 'No es una fecha',
             'end_at.after' => 'La fecha tiene que ser mayor a la de hoy',
         ];
@@ -69,10 +66,9 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required',
             'name_empresa' => 'required|unique:users,name_empresa',
-            'start_at' => 'required|date',
-            'end_at' => 'required|date|after:today',
+            'start_at' => 'date',
+            'end_at' => 'date|after:today',
         ], $messages);
     
         if ($validator->fails()) {
@@ -80,7 +76,8 @@ class UserController extends Controller
         }
     
         $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
+        $randPass = Str::random(12);
+        $input['password'] = bcrypt($randPass);
         $user = User::create($input);
         
         $vecUserRol = [
@@ -90,7 +87,7 @@ class UserController extends Controller
 
         $rolUser = RolUser::create($vecUserRol);
 
-        return response()->json([ "user" => [$user, $rolUser], "msg" => "Usuario registrado", "status"=>200],200);
+        return response()->json(["msg" => "Usuario registrado", "status"=>200],200);
     }
 
     /**

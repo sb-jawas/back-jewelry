@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\service\ImageController;
 use App\Models\Lote;
 use App\Models\Rol;
 use App\Models\RolUser;
@@ -122,7 +123,6 @@ class UserController extends Controller
      */
     public function update(Request $request, string $userId)
     {
-
         $messages = [
             'email.email' => 'El campo email debe ser una dirección de correo válida.',
             'email.unique' => 'El email ya está registrado.',
@@ -144,6 +144,11 @@ class UserController extends Controller
 
         return response()->json($user, 200);
         
+    }
+
+    public function updateImage(Request $request){
+        $image = ImageController::cargarImagen($request,"perfiles");
+        return response()->json($image, 200);
     }
 
     /**

@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 
 /**
@@ -119,19 +121,121 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualizar un usuario.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(Request $request, string $userId)
+    {    
+
+        $messages = [
+            'email.email' => 'El campo email debe ser una dirección de correo válida.',
+            'email.unique' => 'El email ya está registrado.',
+            'name_empresa.unique' => 'El nombre de la empresa ya está en uso'
+        ];
+    
+        $validator = Validator::make($request->all(), [
+            'email' => 'email|unique:users,email',
+            'name_empresa' => 'unique:users,name_empresa',
+        ], $messages);
+    
+        if ($validator->fails()) {
+            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+        }
+
+        $infoUser = User::find($userId);
+
+        $i = 0;
+        $vecDatos = ["name", "name_empresa", "email"];
+        $t = $request->all();
+        $size = count($t);
+        $arrVec = [];
+        while ($i < $size) {
+            if ($t[$vecDatos[$i]] != null) {
+                $arrVec[$vecDatos[$i]] = $t[$vecDatos[$i]];
+            } else {
+                $arrVec[$vecDatos[$i]] = $infoUser[$vecDatos[$i]];
+            }
+            $i++;
+        }
+        $user = User::find($userId)->update($arrVec);
+
+        $user = User::find($userId);
+
+        return response()->json($user, 200);
+        
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Eliminar usuario
      */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(string $userId){
+        $vecValidator = [
+            "user_id" => $userId,
+        ];
+        $messages = [
+            'user_id' => [
+                'exists' => 'Este usuario no existe'
+            ]
+        ];
+    
+        $validator = Validator::make($vecValidator, [
+            'user_id' => 'exists:users,id',
+        ], $messages);
+    
+        if ($validator->fails()) {
+            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+        }
+
+        User::find($userId)->destroy();
+        return response()->json(["msg" => "Eliminado correctamente", "status"=>200], 200);
+
+    }
+
+    public function darBaja(string $userId){
+        $this->bajaUser($userId, now());
+    }
+
+    public function programBaja(Request $req, String $userId){
+
+        $messages = [
+            'user_id' => [
+                'exists' => 'Este usuario no existe'
+            ]
+        ];
+    
+        $validator = Validator::make($req->all(), [
+            'end_at' => 'date|after:today',
+        ], $messages);
+
+        if ($validator->fails()) {
+            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+        }
+
+        $this->bajaUser($userId, $req->get("end_at"));
+    }
+
+
+    private function bajaUser(String $userId, $date){
+        $vecValidator = [
+            "user_id" => $userId,
+        ];
+        $messages = [
+            'user_id' => [
+                'exists' => 'Este usuario no existe'
+            ]
+        ];
+    
+        $validator = Validator::make($vecValidator, [
+            'user_id' => 'exists:users,id',
+        ], $messages);
+    
+        if ($validator->fails()) {
+            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+        }
+
+        $user = User::find($userId);
+        $user->end_at = $date;
+        $user->save();
+        return response()->json(["msg" => "Usuario dado de baja correctamente", "status"=>200], 200);
     }
 
     public function userLote(string $userId, string $loteId){

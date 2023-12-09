@@ -167,7 +167,7 @@ class UserController extends Controller
             return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
         }
 
-        User::find($userId)->destroy();
+        User::destroy($userId);
         return response()->json(["msg" => "Eliminado correctamente", "status"=>200], 200);
 
     }

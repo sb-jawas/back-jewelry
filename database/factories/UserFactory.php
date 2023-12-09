@@ -30,6 +30,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'start_at' => now(),
             'end_at' => now(),
+            'profile' => "https://project-jawas.s3.eu-west-3.amazonaws.com/perfiles/QpjAQcQk1VjSEsu4QefNOWnZvZRShaU5zzNnX1YV.jpg"
         ];
     }
 
@@ -49,7 +50,7 @@ class UserFactory extends Factory
         $this
         ->afterCreating(function ($user) {
             $numRoles = rand(0,4);
-            RolUser::factory($numRoles)->create(['user_id' => $user->id, 'rol_id'=>rand(1,4)]);
+            RolUser::factory($numRoles)->create(['user_id' => $user->id, 'rol_id'=>1]);
         })
         ->afterMaking(function ($user) {
            $user->save();

@@ -146,8 +146,9 @@ class UserController extends Controller
         
     }
 
-    public function updateImage(Request $request){
+    public function updateImage(Request $request, $userId){
         $image = ImageController::cargarImagen($request,"perfiles");
+        User::find($userId)->update(["profile_image"=>$image->url]);
         return response()->json($image, 200);
     }
 

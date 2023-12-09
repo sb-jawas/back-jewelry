@@ -124,7 +124,7 @@ class UserController extends Controller
      * Actualizar un usuario.
      */
     public function update(Request $request, string $userId)
-    {    
+    {
 
         $messages = [
             'email.email' => 'El campo email debe ser una dirección de correo válida.',
@@ -141,22 +141,7 @@ class UserController extends Controller
             return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
         }
 
-        $infoUser = User::find($userId);
-
-        $i = 0;
-        $vecDatos = ["name", "name_empresa", "email"];
-        $t = $request->all();
-        $size = count($t);
-        $arrVec = [];
-        while ($i < $size) {
-            if ($t[$vecDatos[$i]] != null) {
-                $arrVec[$vecDatos[$i]] = $t[$vecDatos[$i]];
-            } else {
-                $arrVec[$vecDatos[$i]] = $infoUser[$vecDatos[$i]];
-            }
-            $i++;
-        }
-        $user = User::find($userId)->update($arrVec);
+        $user = User::find($userId)->update($request->all());
 
         $user = User::find($userId);
 

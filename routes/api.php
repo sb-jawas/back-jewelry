@@ -107,6 +107,7 @@ Route::group(['middleware' => ['cors']], function () {
             Route::get('/{userId}', 'show');
             Route::put('/{userId}', 'update');
             Route::post('/', 'store');
+            Route::post('{userId}/image', 'updateImage');
             Route::delete('/{userId}', 'destroy');
 
             Route::prefix('{userId}/lote')->group(function () {

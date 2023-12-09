@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'start_at',
         'end_at',
+        'profile'
     ];
 
     /**

@@ -238,6 +238,18 @@ class UserController extends Controller
         return response()->json(["msg" => "Usuario dado de baja correctamente", "status"=>200], 200);
     }
 
+    public function searchUserByEmail(Request $req){
+        $pattern = $req->get("email");
+        $users = DB::table('users')->where('email', 'like', '%' . $pattern . '%')->get();
+
+        if(count($users)>=1){
+            return response()->json($users);
+        }else{
+            return response()->json("No se ha podido localizar este usuario",404);
+        }
+        
+    }
+
     public function userLote(string $userId, string $loteId){
         $user = User::find($userId);
         $lote = Lote::where('user_id',$userId)->where('id',$loteId)->get();

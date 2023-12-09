@@ -95,6 +95,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::controller(UserUserController::class)->group(function () {
         Route::prefix('admin')->group(function () {
             Route::get('/', 'index');
+            Route::post('/search', 'searchUserByEmail');
             Route::get('/{userId}', 'show');
             Route::put('/{userId}', 'update');
             Route::delete('/{userId}', 'destroy');

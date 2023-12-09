@@ -12,21 +12,26 @@ class ImageController extends Controller
     static function cargarImagen($request, $whereStorage){
 
         $messages = [
-            'max' => 'El campo se excede del tamaño máximo'
+            "image" =>[  
+                'required' => 'Es obligatorio la imagen',
+                'image' => 'No tiene formato imagen',
+                'mimes' => 'Mimes acpetados: jpeg,png,jpg,gif',
+                'max' => 'El campo se excede del tamaño máximo'
+            ],
         ];
 
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], $messages);
         if ($validator->fails()){
-            return response()->json($validator->errors(),202);
+            return ["msg" => false, "errors"=>$validator->errors()];
         }
         
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $path = $file->store($whereStorage, 's3');
             $url = Storage::disk('s3')->url($path);
-            $vec = ['path' => $path, 'url'=> $url];
+            $vec = [ "msg" =>true, "path" => $path, "url"=> $url];
             return $vec;
         }
 

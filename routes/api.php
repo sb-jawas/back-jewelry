@@ -92,10 +92,18 @@ Route::group(['middleware' => ['cors']], function () {
     // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     //     return $request->user();
     // });
-    Route::prefix('user')->group(function () {
-        Route::controller(UserUserController::class)->group(function () {
-            Route::get('/{id}/mis-roles', 'roles');
+    Route::controller(UserUserController::class)->group(function () {
+        Route::prefix('admin')->group(function () {
             Route::get('/', 'index');
+            Route::get('/{userId}', 'show');
+            Route::post('/search', 'searchUserByEmail');
+            Route::post('', 'store');
+            Route::put('/{userId}', 'update');
+            Route::delete('/{userId}', 'destroy');
+            
+        });
+            Route::prefix('user')->group(function () {
+            Route::get('/{id}/mis-roles', 'roles');
             Route::get('/{userId}', 'show');
             Route::put('/{userId}', 'update');
             Route::post('/', 'store');

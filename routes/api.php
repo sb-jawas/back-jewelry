@@ -95,8 +95,11 @@ Route::group(['middleware' => ['cors']], function () {
             Route::prefix('admin')->group(function () {
                 Route::get('/', 'index');
                 Route::get('/{userId}', 'show');
+                Route::get('/{userId}/active-account', 'activeUser');
                 Route::post('/search', 'searchUserByEmail');
                 Route::post('', 'store');
+                Route::put('/{userId}/program-desactivate', 'programBaja');
+                Route::put('/{userId}/deactivate-account', 'bajaUser');
                 Route::put('/{userId}', 'update');
                 Route::put('/{userId}/roles', 'updateRoles');
                 Route::delete('/{userId}', 'destroy');
@@ -115,6 +118,8 @@ Route::group(['middleware' => ['cors']], function () {
                     });
                 });
             });
+
+            Route::post('/image','uploadImage');
         });
     });
 });

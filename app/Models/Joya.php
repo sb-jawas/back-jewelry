@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @author: badr => @bhamidou
+ */
+
 class Joya extends Model
 {
     use HasFactory;
@@ -16,6 +20,7 @@ class Joya extends Model
 
     protected $fillable = [
         'id',
+        'name',
         'user_id',
         'desc',
         'foto'

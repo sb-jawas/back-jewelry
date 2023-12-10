@@ -25,7 +25,10 @@ class JoyasController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $newJoya = Joya::create($request->all());
+        $newJoya->save();
+
+        return response()->json($newJoya, 201);
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\JoyasController;
 use App\Http\Controllers\Lotes\ClasificadorController;
 use App\Http\Controllers\Lotes\ColaboradorController;
 use App\Http\Controllers\Lotes\LoteController;
@@ -119,7 +120,17 @@ Route::group(['middleware' => ['cors']], function () {
                 });
             });
 
-            Route::post('/image','uploadImage');
+            Route::post('/image', 'uploadImage');
+        });
+
+
+        Route::controller(JoyasController::class)->group(function () {
+            Route::prefix('joyas')->group(function () {
+                Route::get('', 'index');
+                Route::get('{joyaId}', 'show');
+                Route::post('', 'store');
+                Route::delete('{joyaId}', 'destroy');
+            });
         });
     });
 });

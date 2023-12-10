@@ -299,6 +299,7 @@ class UserController extends Controller
         $user->end_at = null;
         
         $user->save();
+        return response()->json(["msg" => "Usuario activado", "status"=>200], 200);
     }
 
     public function searchUserByEmail(Request $req){

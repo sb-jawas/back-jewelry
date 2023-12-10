@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('long');
             $table->string('observation');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('status_code_id');
-            $table->foreign('status_code_id')->references('id')->on('status_code')->onDelete('cascade');
+            $table->foreign('status_code_id')->references('id')->on('status_code');
             $table->timestamps();
         });
     }

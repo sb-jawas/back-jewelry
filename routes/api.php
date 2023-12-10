@@ -83,36 +83,36 @@ Route::group(['middleware' => ['cors']], function () {
                 Route::post('/', 'store');
             });
         });
-    });
 
 
-    // Route::post('/login', [AuthController::class, 'login']);
+        // Route::post('/login', [AuthController::class, 'login']);
 
-    // Route::post('/register', [AuthController::class, 'register']);
-    // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    //     return $request->user();
-    // });
-    Route::controller(UserUserController::class)->group(function () {
-        Route::prefix('admin')->group(function () {
-            Route::get('/', 'index');
-            Route::get('/{userId}', 'show');
-            Route::post('/search', 'searchUserByEmail');
-            Route::post('', 'store');
-            Route::put('/{userId}', 'update');
-            Route::delete('/{userId}', 'destroy');
-            
-        });
+        // Route::post('/register', [AuthController::class, 'register']);
+        // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+        //     return $request->user();
+        // });
+        Route::controller(UserUserController::class)->group(function () {
+            Route::prefix('admin')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{userId}', 'show');
+                Route::post('/search', 'searchUserByEmail');
+                Route::post('', 'store');
+                Route::put('/{userId}', 'update');
+                Route::put('/{userId}/roles', 'updateRoles');
+                Route::delete('/{userId}', 'destroy');
+            });
             Route::prefix('user')->group(function () {
-            Route::get('/{id}/mis-roles', 'roles');
-            Route::get('/{userId}', 'show');
-            Route::put('/{userId}', 'update');
-            Route::post('/', 'store');
-            Route::post('{userId}/image', 'updateImage');
-            Route::delete('/{userId}', 'destroy');
+                Route::get('/{id}/mis-roles', 'roles');
+                Route::get('/{userId}', 'show');
+                Route::put('/{userId}', 'update');
+                Route::post('/', 'store');
+                Route::post('{userId}/image', 'updateImage');
+                Route::delete('/{userId}', 'destroy');
 
-            Route::prefix('{userId}/lote')->group(function () {
-                Route::controller(LoteController::class)->group(function () {
-                    Route::get('/', 'show');
+                Route::prefix('{userId}/lote')->group(function () {
+                    Route::controller(LoteController::class)->group(function () {
+                        Route::get('/', 'show');
+                    });
                 });
             });
         });

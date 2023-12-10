@@ -114,7 +114,10 @@ class UserController extends Controller
         }
         
         $user = User::find($userId);
-        return response()->json(["msg" => $user, "status"=>200], 200);
+        $roles = DB::select('select rol.id,rol.name from rol inner join rol_has_user on rol.id = rol_has_user.rol_id where rol_has_user.user_id = ?',[$userId]);
+        $user->roles = $roles;
+        
+        return response()->json(["msg" => $user,"status"=>200], 200);
 
     }
 
@@ -144,6 +147,29 @@ class UserController extends Controller
 
         return response()->json($user, 200);
         
+    }
+
+    public function updateRoles(Request $request, String $userId){
+        $messages = [
+            'rol_id.required' => 'Es necesario el rol',
+            'rol_id.exists' => 'Este rol no existe'
+        ];
+    
+        $validator = Validator::make($request->all(), [
+            'rol_id' => 'required|exists:rol,id',
+        ], $messages);
+    
+        if ($validator->fails()) {
+            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+        }
+
+        $user = RolUser::where('user_id',$userId)->delete();
+        $user = RolUser::insert($request->all());
+        
+
+        $user = User::find($userId);
+
+        return response()->json($user, 200);
     }
 
     public function updateImage(Request $request, $userId){

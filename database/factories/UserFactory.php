@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    protected static ?string $password;
+    protected static ?string $password = "P@ssword123";
 
     /**
      * Define the model's default state.
@@ -24,12 +24,11 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'name_empresa' => fake()->company(),
-            'email' => fake()->unique()->safeEmail(),
+            'email' => fake()->unique()->email,
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' =>  bcrypt(static::$password),
             'remember_token' => Str::random(10),
             'start_at' => now(),
-            'end_at' => now(),
             'profile' => "https://project-jawas.s3.eu-west-3.amazonaws.com/perfiles/QpjAQcQk1VjSEsu4QefNOWnZvZRShaU5zzNnX1YV.jpg"
         ];
     }
@@ -48,12 +47,15 @@ class UserFactory extends Factory
     {
         return
         $this
-        ->afterCreating(function ($user) {
-            $numRoles = rand(0,4);
-            RolUser::factory($numRoles)->create(['user_id' => $user->id, 'rol_id'=>1]);
-        })
         ->afterMaking(function ($user) {
-           $user->save();
-        })        ;
+            $numRoles = rand(1,4);
+            $i = 1;
+            $user->save();
+            while ($i <=$numRoles) {
+               $rolUser =  RolUser::factory()->make(['rol_id' => $i, 'user_id' =>$user->id]);
+               $rolUser->save();
+                $i++;
+            }
+        });
     }
 }

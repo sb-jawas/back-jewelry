@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('lote_id');
             $table->foreign('lote_id')->references('id')->on('lote')->onDelete('cascade');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->primary('lote_id');
             $table->timestamps();
         });

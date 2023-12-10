@@ -14,12 +14,14 @@ class RolUser extends Model
     protected $hidden = [
         'created_at',
         'updated_at',
-        'id'
     ];
 
     protected $fillable = [
-        'id',
         'user_id',
         'rol_id',
     ];
+    public function rolName()
+    {
+        return $this->hasMany(Rol::class,'rol_id','id');
+    }
 }

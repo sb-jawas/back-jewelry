@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('desc');
             $table->integer('is_hardware');
             $table->unsignedBigInteger('created_user_id');
-            $table->foreign('created_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('created_user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

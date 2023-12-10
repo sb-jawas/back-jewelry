@@ -99,7 +99,7 @@ Route::group(['middleware' => ['cors']], function () {
                 Route::post('/search', 'searchUserByEmail');
                 Route::post('', 'store');
                 Route::put('/{userId}/program-desactivate', 'programBaja');
-                Route::put('/{userId}/deactivate-account', 'bajaUser');
+                Route::put('/{userId}/deactivate-account', 'darBaja');
                 Route::put('/{userId}', 'update');
                 Route::put('/{userId}/roles', 'updateRoles');
                 Route::delete('/{userId}', 'destroy');

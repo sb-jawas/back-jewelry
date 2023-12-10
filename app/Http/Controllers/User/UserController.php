@@ -216,7 +216,12 @@ class UserController extends Controller
     }
 
     public function darBaja(string $userId){
-        $this->bajaUser($userId, now());
+        $user = $this->bajaUser($userId, now());
+        if($user["msg"]){
+            return response()->json($user, 200);
+        }else{
+            return response()->json($user["errors"], 400);
+        }
     }
 
     public function programBaja(Request $req, String $userId){
@@ -235,11 +240,16 @@ class UserController extends Controller
             return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
         }
 
-        $this->bajaUser($userId, $req->get("end_at"));
+        $user = $this->bajaUser($userId, $req->get("end_at"));
+        if($user["msg"]){
+            return response()->json($user, 200);
+        }else{
+            return response()->json($user["errors"], 400);
+        }
     }
 
 
-    private function bajaUser(String $userId, $date){
+    public function bajaUser(String $userId, $date){
         $vecValidator = [
             "user_id" => $userId,
         ];
@@ -254,13 +264,17 @@ class UserController extends Controller
         ], $messages);
     
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+            return $validator->errors();
         }
+
+
 
         $user = User::find($userId);
         $user->end_at = $date;
+        $user->tokens()->delete();
         $user->save();
-        return response()->json(["msg" => "Usuario dado de baja correctamente", "status"=>200], 200);
+
+        return ["msg" => "Usuario dado de baja correctamente", "status"=>200];
     }
 
     public function activeUser(String $userId){

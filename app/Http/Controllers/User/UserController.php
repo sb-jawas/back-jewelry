@@ -10,7 +10,6 @@ use App\Models\RolUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -79,15 +78,23 @@ class UserController extends Controller
         $input = $request->all();
         $randPass = Str::random(12);
         $input['password'] = bcrypt($randPass);
+
+        if(empty($request->get('start_at'))){
+            $input['start_at'] = now();
+        }
+
         $user = User::create($input);
         
-        $vecUserRol = [
-            "user_id" => $user->id,
-            "rol_id" => 1
-        ];
-
-        $rolUser = RolUser::create($vecUserRol);
-
+        if(empty($request->get('roles'))){
+            $vecUserRol = [
+                "user_id" => $user->id,
+                "rol_id" => 1
+            ];
+            RolUser::create($vecUserRol);
+        }else{
+            RolUser::create($request->get('roles'));
+        }
+        
         return response()->json(["msg" => "Usuario registrado", "status"=>200],200);
     }
 
@@ -151,12 +158,12 @@ class UserController extends Controller
 
     public function updateRoles(Request $request, String $userId){
         $messages = [
-            'rol_id.required' => 'Es necesario el rol',
-            'rol_id.exists' => 'Este rol no existe'
+            '*.rol_id.required' => 'Es necesario el rol',
+            '*.rol_id.exists' => 'Este rol no existe'
         ];
     
         $validator = Validator::make($request->all(), [
-            'rol_id' => 'required|exists:rol,id',
+            '*.rol_id' => 'required|exists:rol,id',
         ], $messages);
     
         if ($validator->fails()) {
@@ -256,6 +263,30 @@ class UserController extends Controller
         return response()->json(["msg" => "Usuario dado de baja correctamente", "status"=>200], 200);
     }
 
+    public function activeUser(String $userId){
+        $vecValidator = [
+            "user_id" => $userId,
+        ];
+        $messages = [
+            'user_id' => [
+                'exists' => 'Este usuario no existe'
+            ]
+        ];
+    
+        $validator = Validator::make($vecValidator, [
+            'user_id' => 'exists:users,id',
+        ], $messages);
+    
+        if ($validator->fails()) {
+            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+        }
+        
+        $user = User::find($userId);
+        $user->end_at = null;
+        
+        $user->save();
+    }
+
     public function searchUserByEmail(Request $req){
         $pattern = $req->get("email");
         $users = DB::table('users')->where('email', 'like', '%' . $pattern . '%')->get();
@@ -278,5 +309,14 @@ class UserController extends Controller
         $user = User::find($userId);
         $lote = Lote::where('user_id',$userId)->get();
         return response()->json($lote);
+    }
+
+    public function uploadImage(Request $request){
+        $image = ImageController::cargarImagen($request,"perfiles");
+        if($image["msg"]){
+            return response()->json($image, 200);
+        }else{
+            return response()->json($image["errors"], 400);
+        }
     }
 }

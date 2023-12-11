@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Service\MailController;
 use App\Models\RolUser;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -78,7 +79,7 @@ class AuthController extends Controller
         ];
 
         $rolUser = RolUser::create($vecUserRol);
-
+        MailController::sendmail('welcome', $input['name'],$input['email'], ['username'=>'badr', 'email' => 'badrhamidou@gmail.com'],'Registro Jawlary');
         return response()->json([ "user" => [$user, $rolUser], "msg" => "Usuario registrado", "status"=>200],200);
     }
 

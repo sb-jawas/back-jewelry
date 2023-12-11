@@ -48,7 +48,7 @@ class ClasificadorController extends Controller
 
     public function disponible()
     {
-        $lotes = DB::select('select lote.id, users.name_empresa as "empresa", lote.created_at, status_code.name as "status" from lote inner join users on users.id = lote.user_id inner join status_code on status_code.id = lote.status_code_id where lote.status_code_id = 3');
+        $lotes = DB::select('select lote.id, users.name_empresa as "empresa", lote.created_at, status_code.name as "status" from lote inner join users on users.id = lote.user_id inner join status_code on status_code.id = lote.status_code_id where lote.status_code_id in (1, 2, 3)');
 
         return response()->json($lotes);
     }
@@ -235,5 +235,11 @@ class ClasificadorController extends Controller
         $lote->status_code_id = 6;
         $lote->save();
         return response()->json($lote);
+    }
+
+    public function todos(){
+        $lotes = DB::select('select lote.id, users.name_empresa as "empresa", lote.created_at, status_code.name as "status" from lote inner join users on users.id = lote.user_id inner join status_code on status_code.id = lote.status_code_id');
+        return response()->json($lotes, 200);
+
     }
 }

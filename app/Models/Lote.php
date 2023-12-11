@@ -28,4 +28,8 @@ class Lote extends Model
         return $this->hasMany(StatusCode::class, 'id','status_code_id');
     }
 
+    function userEmpresa(){
+        return $this->hasMany(User::class, 'id','user_id');
+    }
+
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\service\ImageController;
+use App\Http\Controllers\Service\MailController;
 use App\Models\Lote;
 use App\Models\Rol;
 use App\Models\RolUser;
@@ -358,6 +359,8 @@ class UserController extends Controller
         $user = User::find($idUser[0]->id);
         $randPass = Str::random(12);
         $newPass['password'] = bcrypt($randPass);
+
+        MailController::sendmail('forget', $user['name'],$user['email'], ['username'=> $user['name'], 'password' => $randPass],'Recuperación de contraseña');
 
         $user->update($newPass);
         return response()->json(["msg" => $randPass, "status"=>200], 200);

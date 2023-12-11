@@ -27,8 +27,8 @@ Route::group(['middleware' => ['cors']], function () {
     Route::controller(APIAuthController::class)->group(function () {
         Route::post('signup', 'signup');
         Route::post('login', 'login');
-        Route::post('logout', 'logout');
-        Route::post('full-logout', 'fullLogout');
+        Route::post('logout/{userId}', 'logout');
+        Route::post('full-logout/{userId}', 'fullLogout');
     });
     Route::post('signup/image', [UserUserController::class,'uploadImage']);
     Route::post('forget-pass', [UserUserController::class,'forgetPass']);

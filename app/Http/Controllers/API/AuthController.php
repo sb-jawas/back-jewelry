@@ -79,13 +79,13 @@ class AuthController extends Controller
         ];
 
         $rolUser = RolUser::create($vecUserRol);
-        MailController::sendmail('welcome', $input['name'],$input['email'], ['username'=>'badr', 'email' => 'badrhamidou@gmail.com'],'Registro Jawlary');
+        MailController::sendmail('welcome', $input['name'],$input['email'], ['username'=> $input['name'], 'email' => $input['email']],'Registro Jawlary');
         return response()->json([ "user" => [$user, $rolUser], "msg" => "Usuario registrado", "status"=>200],200);
     }
 
-    public function logout(Request $request)
+    public function logout(String $userId, Request $request)
     {
-        $cred = ['email' => $request->email, 'password' => $request->password];
+        $user = User::find($userId);
         $token = strval($request->bearerToken());
         $check = true;
         $i = 0;
@@ -98,25 +98,21 @@ class AuthController extends Controller
             }
             $i++;
         }
-        if(Auth::attempt($cred)){
-            Auth::user()->tokens()->where('id',$tokenId)->delete();
+        try{
+            $user->tokens()->where('id',$tokenId)->delete();
             return response()->json(["msg"=>"Sesión actual cerrada"],200);
+        }catch(\Exception $exception){
+            return response()->json(['msg'=> $exception->getMessage() ], 500);
         }
-        else {
-            return response()->json("Unauthorized",401);
-        }
-
     }
 
-    public function fullLogout(Request $request){
-        $cred = ['email' => $request->email, 'password' => $request->password];
-                
-        if(Auth::attempt($cred)){
-            Auth::user()->tokens()->delete();
+    public function fullLogout(String $userId){
+        try{
+            $user = User::find($userId);
+            $user->tokens()->delete();
             return response()->json(["msg"=>"Se ha cerrado sesión en todos sus dispositivos."],200);
-        }
-        else {
-            return response()->json("Unauthorized",401);
+        }catch(\Exception $exception){
+            return response()->json(["msg"=> $exception->getMessage() ], 500);
         }
     }
 }

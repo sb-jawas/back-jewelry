@@ -40,7 +40,7 @@ Route::group(['middleware' => ['cors']], function () {
 
         Route::get('info-despiece/{loteId}', [ClasificadorController::class, 'infoDespiece']);
 
-        Route::prefix('colaborador')->group(function () {
+        Route::prefix('colaborador')->middleware('colaborador')->group(function () {
             Route::controller(ColaboradorController::class)->group(function () {
                 Route::get('{userId}/mis-lotes', 'index');
                 Route::get('{userId}/lote/{loteId}', 'show');
@@ -49,7 +49,7 @@ Route::group(['middleware' => ['cors']], function () {
             });
         });
 
-        Route::prefix('clasificador')->group(function () {
+        Route::prefix('clasificador')->middleware('clasificador')->group(function () {
             Route::controller(ClasificadorController::class)->group(function () {
                 Route::get('lotes', 'todos');
                 Route::get('disponibles', 'disponible');
@@ -67,7 +67,7 @@ Route::group(['middleware' => ['cors']], function () {
             });
         });
 
-        Route::controller(ComponentesController::class)->group(function () {
+        Route::controller(ComponentesController::class)->middleware('designer')->group(function () {
             Route::prefix("componentes")->group(function () {
                 Route::get('/', 'allComponentes');
                 Route::get('{componenteId}', 'show');
@@ -91,8 +91,9 @@ Route::group(['middleware' => ['cors']], function () {
         // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         //     return $request->user();
         // });
+        
         Route::controller(UserUserController::class)->group(function () {
-            Route::prefix('admin')->group(function () {
+            Route::prefix('admin')->middleware('admin')->group(function () {
                 Route::get('/', 'index');
                 Route::get('/{userId}', 'show');
                 Route::get('/{userId}/activate-account', 'activeUser');

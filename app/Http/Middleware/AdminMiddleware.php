@@ -14,10 +14,10 @@ class AdminMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {   
+    {
         $user = $request->user();
 
-        if ($user->tokenCan("Administrador")) {
+        if ($user->tokenCan("Admin")) {
            return $next($request);
         }
         else {

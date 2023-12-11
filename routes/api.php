@@ -30,6 +30,8 @@ Route::group(['middleware' => ['cors']], function () {
         Route::post('logout', 'logout');
         Route::post('full-logout', 'fullLogout');
     });
+    Route::post('signup/image', [UserUserController::class,'uploadImage']);
+    Route::post('forget-pass', [UserUserController::class,'forgetPass']);
 
     Route::get('', function () {
         return response()->json("Unauthorized", 401);

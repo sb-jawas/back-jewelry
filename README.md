@@ -1,66 +1,962 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Jawalry
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+El proyecto Jawalry surge como una iniciativa creativa y altruista inspirada en los Jawas, esos misteriosos personajes de Star Wars que se dedicaban a traficar con cacharros electrónicos. Al igual que los Jawas, nosotros nos embarcaremos en la misión de rescatar cacharros obsoletos y descatalogados para transformarlos en auténticas joyas y abalorios con un enfoque artesanal y sin ánimo de lucro.
 
-## About Laravel
+Este proyecto es la parte del backend, donde recibirá todas las peticiones.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requisitos del sistema
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* Tener PHP instalado
+* Tener Composer instalado
+* Una base de datos, con el nombre jewelry, si se desea usar otra base de datos, con otra configuración, se deberá de configurar el fichero `.env`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Instalación
 
-## Learning Laravel
+Para la instalación del proyecto, deberemos de ejecutar el siguiente comando para poder descargarse y trabajar con Laravel:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```sh
+composer update
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Así mismo, mientras se nos descarga la carpeta Vendor, pásaremos a copiar el archivo .env.example a .env y deberemos de configura la conexión a la base de datos.
+Ejemplo:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3333
+DB_DATABASE=jewelry
+DB_USERNAME=root
+DB_PASSWORD=1234
+```
 
-## Laravel Sponsors
+Por último deberemos de generar unas claves para que Laravel pueda usarlo para cifrar en distintos lugares de uso interno.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```sh
+php artisan key:generate
+```
 
-### Premium Partners
+## Base de datos
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Es posible importarse el script de la base de datos o, si se prefiere, se puede realizar la migración.
 
-## Contributing
+### Migración
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Para ejecutar la migracion con sus respectivos seeders, ejecutar los siguiente scripts, en función del sistema operativo.
 
-## Code of Conduct
+En linux:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```sh
+chmod +x run.sh
+./run.sh
+```
 
-## Security Vulnerabilities
+En Windows:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bat
+script.bat
+```
 
-## License
+El usuario que se crea para poder iniciar sesión:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+    'email' => 'fernando@cifp.com',
+    'password' => "Chubaca2024",
+```
+
+## Testing
+
+Hay test para probar:
+
+```sh
+php artisan test
+```
+
+## EndPoints
+
+## Registro y inicio de sesión
+
+* **POST /signup**
+  * Controlador: `APIAuthController@signup`
+  JSON esperado:
+
+  ```json
+  {
+    "name": "NombreUsuario",
+    "email": "testing@foo.tld",
+    "password": "P@ssword123",
+    "name_empresa": "Repsol"
+  }```
+
+  Respuesta 200:
+
+  ```json
+  {
+    "user": [
+      {
+        "id": 1,
+        "name": "NombreUsuario",
+        "email": "usuario@example.com",
+        "name_empresa": "NombreEmpresa",
+        "start_at": "2023-01-01 12:00:00",
+        "created_at": "2023-01-01 12:00:00",
+        "updated_at": "2023-01-01 12:00:00"
+      },
+      {
+        "id": 1,
+        "user_id": 1,
+        "rol_id": 1,
+        "created_at": "2023-01-01 12:00:00",
+        "updated_at": "2023-01-01 12:00:00"
+      }
+    ],
+    "msg": "Usuario registrado",
+    "status": 200
+  }```
+
+  Si ya está registrado, código 400:
+
+  ```json
+  {
+    "msg": {
+      "email": ["El email ya está registrado."],
+      "name_empresa": ["El nombre de la empresa ya está en uso"]
+    },
+    "status": 400
+  }```
+
+* **POST /login**
+  * Controlador: `APIAuthController@login`
+
+  JSON esperado:
+
+  ```json
+  {
+    "email": "usuario@example.com",
+    "password": "contraseña123"
+  }```
+
+Respuesta 200:
+
+```json
+{
+  "token": "access_token",
+  "user_id": 1,
+  "user_name": "NombreUsuario"
+}
+```
+
+Respuesta 401:
+
+```json
+"Unauthorized"
+```
+
+En caso de que al hacer el login está de baja.
+Respuesta 400:
+
+```json
+{
+  "msg": "Este usuario está de baja desde el 2023-01-01 12:00:00"
+}
+```
+
+En caso de que al hacer el login, la fecha de activación de la cuenta está en el futuro.
+Respuesta:
+
+```json
+{
+  "msg": "Este usuario está de baja desde el 2023-01-01 12:00:00"
+}
+```
+
+* **POST /logout/{userId}**
+  * Controlador: `APIAuthController@logout`
+  Respuesta esperada:
+
+  ```json
+  {
+  "msg": "Sesión actual cerrada"
+  }
+  ```
+
+* **POST /full-logout/{userId}**
+  * Controlador: `APIAuthController@fullLogout`
+
+  ```json
+  {
+    "msg": "Se ha cerrado sesión en todos sus dispositivos."
+  }
+  ```
+
+## Cambio de imagen para el registro
+
+* **POST /signup/image**
+  * Controlador: `UserUserController@uploadImage`
+  JSON esperado:
+   ```json
+  {
+    "image": [Archivo de imagen]
+  }
+  ```
+
+## Recuperación de contraseña
+
+* **POST /forget-pass**
+  * Controlador: `UserUserController@forgetPass`
+
+* **GET /**
+  * Controlador: Closure (Respuesta JSON "Unauthorized")
+  * Nombre: `nologin`
+
+## Información de despiece para Colaborador y Clasificador
+
+* **GET /colaborador/info-despiece/{loteId}**
+  * Controlador: `ClasificadorController@infoDespiece`
+  * Middleware: `colaborador`
+* **GET /clasificador/info-despiece/{loteId}**
+  * Controlador: `ClasificadorController@infoDespiece`
+  * Middleware: `clasificador`
+
+## Funciones específicas para Colaborador
+
+* **GET /colaborador/{userId}/mis-lotes**
+  * Controlador: `ColaboradorController@index`
+* **GET /colaborador/{userId}/lote/{loteId}**
+  * Controlador: `ColaboradorController@show`
+* **POST /colaborador/lote**
+  * Controlador: `ColaboradorController@store`
+* **PUT /colaborador/lote/{loteId}/cancelar**
+  * Controlador: `ColaboradorController@cancelar`
+
+## Rechazar lote por Clasificador
+
+* **PUT /lote/{loteId}/rechazar**
+  * Controlador: `ClasificadorController@rechazar`
+  * Middleware: `colaborador`
+
+## Funciones específicas para Clasificador
+
+* **GET /clasificador/lotes**
+  * Controlador: `ClasificadorController@todos`
+* **GET /clasificador/disponibles**
+  * Controlador: `ClasificadorController@disponible`
+* **GET /clasificador/{userId}/mis-lotes**
+  * Controlador: `ClasificadorController@index`
+* **GET /clasificador/{userId}/mis-clasificados**
+  * Controlador: `ClasificadorController@clasificados`
+* **GET /clasificador/lote/{loteId}**
+  * Controlador: `ClasificadorController@show`
+* **POST /clasificador/{userId}/asign**
+  * Controlador: `ClasificadorController@store`
+* **PUT /clasificador/{loteId}/clasificar**
+  * Controlador: `ClasificadorController@clasificar`
+
+## Funciones específicas para Clasificador relacionadas con Componentes
+
+* **GET /clasificador/componentes**
+  * Controlador: `ComponentesController@index`
+* **GET /clasificador/componentes/{userId}**
+  * Controlador: `ComponentesController@showByUser`
+
+## Funciones generales para Clasificador relacionadas con Componentes
+
+* **GET /componentes**
+  * Controlador: `ComponentesController@allComponentes`
+
+  ```json
+  [
+    {
+      "id": 1,
+      "name": "CPU",
+      "desc": "Unidad Central de Procesamiento",
+      "is_hardware": 1,
+      "created_user_id": 1
+    },
+    {
+      "id": 2,
+      "name": "RAM",
+      "desc": "Memoria de Acceso Aleatorio",
+      "is_hardware": 1,
+      "created_user_id": 1
+    },
+    {
+      "id": 3,
+      "name": "GPU",
+      "desc": "Unidad de Procesamiento de Gráficos",
+      "is_hardware": 1,
+      "created_user_id": 1
+    },
+  ...
+  ]```
+
+* **GET /componentes/{componenteId}**
+  * Controlador: `ComponentesController@show`
+    JSON esperado:
+
+  ```json
+    {
+      "id": 1,
+      "name": "CPU",
+      "desc": "Unidad Central de Procesamiento",
+      "is_hardware": 1,
+      "created_user_id": 1
+  }```
+
+* **PUT /componentes/{componenteId}**
+  * Controlador: `ComponentesController@update`
+  JSON esperado:
+
+```json
+{
+    "id": 1,
+    "name": "CPU2",
+    "desc": "Unidad Central de Procesamiento2",
+    "is_hardware": 1,
+    "created_user_id": 1
+  }
+```
+
+Respuesta:
+
+```json
+{
+    "id": 1,
+    "name": "CPU2",
+    "desc": "Unidad Central de Procesamiento2",
+    "is_hardware": 1,
+    "created_user_id": 1
+  }
+```
+
+* **POST /componentes**
+  * Controlador: `ComponentesController@store`
+
+  Cuerpo de la solicitud:
+
+```json
+{
+    "id": 6,
+    "name": "CPU5",
+    "desc": "Unidad Central de Procesamiento6",
+    "is_hardware": 1,
+    "created_user_id": 1
+}
+```
+
+Respuesta:
+
+```json
+{
+    "id": 6,
+    "name": "CPU5",
+    "desc": "Unidad Central de Procesamiento6",
+    "is_hardware": 1,
+    "created_user_id": 1
+}
+```
+
+* **DELETE /componentes/{componenteId}**
+  * Controlador: `ComponentesController@destroy`
+ /componetes/1
+JSON respuesta:
+  ```json
+    {
+      "message": "Componente eliminado con éxito"
+    }```
+
+## Funciones generales para Administrador relacionadas con Componentes
+
+### Son las mismas que para Componentes
+
+* **GET /admin/componentes**
+  * Controlador: `ComponentesController@allComponentes`
+* **GET /admin/componentes/{componenteId}**
+  * Controlador: `ComponentesController@show`
+* **PUT /admin/componentes/{componenteId}**
+  * Controlador: `ComponentesController@update`
+* **POST /admin/componentes**
+  * Controlador: `ComponentesController@store`
+* **DELETE /admin/componentes/{componenteId}**
+  * Controlador: `ComponentesController@destroy`
+
+## Operaciones relacionadas con Lotes
+
+* **GET /lote/{loteId}**
+  * Controlador: `LoteController@show`
+
+  
+* **POST /lote/ **
+  * Controlador: `LoteController@store`
+
+# Endpoints para la administración de usuarios
+
+## Operaciones de administrador
+
+* **GET /admin**
+  * Controlador: `UserUserController@index`
+  ```json 
+   Esperado 200:
+
+```json
+  [
+    {
+      "id": 1,
+      "name": "Usuario1",
+      "email": "usuario1@example.com",
+      "name_empresa": "Empresa1",
+      "start_at": "2023-01-01 12:00:00",
+      "end_at": null,
+      "created_at": "2023-01-01 12:00:00",
+      "updated_at": "2023-01-01 12:00:00"
+    },
+    {
+      "id": 2,
+      "name": "Usuario2",
+      "email": "usuario2@example.com",
+      "name_empresa": "Empresa2",
+      "start_at": "2023-01-01 12:00:00",
+      "end_at": null,
+      "created_at": "2023-01-01 12:00:00",
+      "updated_at": "2023-01-01 12:00:00"
+    }
+  ]
+  ```
+
+* **GET /admin/{userId}**
+  * Controlador: `UserUserController@show`
+* **GET /admin/{userId}/activate-account**
+  * Controlador: `UserUserController@activeUser`
+* **POST /admin/search**
+  * Controlador: `UserUserController@searchUserByEmail`
+* **POST /admin**
+  * Controlador: `UserUserController@store`
+* **PUT /admin/{userId}/program-desactivate**
+  * Controlador: `UserUserController@programBaja`
+* **PUT /admin/{userId}/desactivate-account**
+  * Controlador: `UserUserController@darBaja`
+* **PUT /admin/{userId}**
+  * Controlador: `UserUserController@update`
+* **PUT /admin/{userId}/roles**
+  * Controlador: `UserUserController@updateRoles`
+* **DELETE /admin/{userId}**
+  * Controlador: `UserUserController@destroy`
+
+## Operaciones de usuario
+
+* **GET /user/{id}/mis-roles**
+  * Controlador: `UserUserController@roles`
+
+  Esperado 200:
+  ```json
+    [
+    {
+      "id": 1,
+      "name": "Colaborador",
+      "created_at": "2023-01-01 12:00:00",
+      "updated_at": "2023-01-01 12:00:00"
+    },
+    {
+      "id": 2,
+      "name": "Clasificador",
+      "created_at": "2023-01-01 12:00:00",
+      "updated_at": "2023-01-01 12:00:00"
+    }
+  ]```
+
+* **GET /user/{userId}**
+  * Controlador: `UserUserController@show`
+
+```json
+  {
+  "msg": {
+    "id": 1,
+    "name": "Usuario1",
+    "email": "usuario1@example.com",
+    "name_empresa": "Empresa1",
+    "start_at": "2023-01-01 12:00:00",
+    "end_at": null,
+    "created_at": "2023-01-01 12:00:00",
+    "updated_at": "2023-01-01 12:00:00",
+    "roles": [
+      {
+        "id": 1,
+        "name": "Colaborador",
+        "created_at": "2023-01-01 12:00:00",
+        "updated_at": "2023-01-01 12:00:00"
+      },
+      {
+        "id": 2,
+        "name": "Clasificador",
+        "created_at": "2023-01-01 12:00:00",
+        "updated_at": "2023-01-01 12:00:00"
+      }
+    ]
+  },
+  "status": 200
+}```
+
+* **PUT /user/{userId}**
+  * Controlador: `UserUserController@update`
+   JSON esperado:
+  
+  ```json
+    {
+    "email": "nuevousuario@example.com",
+    "name_empresa": "NuevaEmpresa"
+  }```
+
+  Respuesta 200:
+
+  ```json
+    {
+    "id": 1,
+    "name": "Usuario1",
+    "email": "nuevousuario@example.com",
+    "name_empresa": "NuevaEmpresa",
+    "start_at": "2023-01-01 12:00:00",
+    "end_at": null,
+    "created_at": "2023-01-01 12:00:00",
+    "updated_at": "2023-01-01 12:00:00"
+  }```
+
+  Error 400:
+
+  ```json
+    {
+    "msg": {
+      "email": ["El email ya está registrado."],
+      "name_empresa": ["El nombre de la empresa ya está en uso"]
+    },
+    "status": 400
+  }```
+
+* **POST /user/
+  * Controlador: `UserUserController@store`
+  JSON esperado:
+
+  ```json
+    {
+    "name": "NuevoUsuario",
+    "email": "nuevousuario@example.com",
+    "name_empresa": "NuevaEmpresa",
+    "roles": [
+      {
+        "rol_id": 1
+      },
+      {
+        "rol_id": 2
+      }
+    ],
+    "start_at": "2023-01-01 12:00:00",
+    "end_at": null
+  }```
+
+Respuesta 200:
+
+  ```json
+  {
+    "msg": "Usuario registrado",
+    "status": 200
+  }```
+
+  Error 400:
+
+  ```json
+  {
+    "msg": {
+      "email": ["El email ya está registrado."],
+      "name_empresa": ["El nombre de la empresa ya está en uso"]
+    },
+    "status": 400
+  }```
+
+* **POST /user/{userId}/image**
+  * Controlador: `UserUserController@updateImage`
+  Esperado 200:
+
+  
+
+* **DELETE /user/{userId}**
+  * Controlador: `UserUserController@destroy`
+ 
+
+## Operaciones de usuario relacionadas con Lotes
+
+* **GET /user/{userId}/lote/
+  * Controlador: `LoteController@show`
+
+## Operaciones generales de usuario
+
+* **POST /user/image**
+  * Controlador: `UserUserController@uploadImage`
+  JSON esperado:
+  ```json
+  {
+    "image": [Archivo de imagen]
+  }
+  ```
+
+  Respuesta 200:
+  ```json
+    {
+    "msg": "Imagen actualizada correctamente",
+    "status": 200
+  }```
+
+
+### Controlador de Lote
+
+Obtener Mis Lotes
+
+    Endpoint: /mis-lotes/{userId}
+    Método: GET
+    Descripción: Recupera una lista de lotes asociados al usuario especificado cuyo estado es recogido.
+    Parámetros:
+        userId (Parámetro de ruta) - ID del usuario.
+
+Respuesta:
+
+```json
+{
+    {
+    "id": 2,
+    "ubi": "test",
+    "observation": "test",
+    "empresa": "Bins, Sanford and Strosin",
+    "status": "Recogido",
+    "status_code_id": 2,
+    "created_at": "2023-11-29 21:22:08"
+  }
+}```
+
+Obtener Disponibles
+
+    Endpoint: /lote/disponibles
+    Método: GET
+    Descripción: Obtiene la lista de lotes disponibles.
+
+Respuesta:
+
+```json
+[
+  {
+    "id": 1,
+    "ubi": "test",
+    "observation": "test",
+    "empresa": "Bins, Sanford and Strosin",
+    "status": "Creado",
+    "status_code_id": 1,
+    "created_at": "2023-11-29T21:21:10.000000Z"
+  },
+  {
+    "id": 3,
+    "ubi": "test2",
+    "observation": "test2",
+    "empresa": "Bins, Sanford and Strosin",
+    "status": "Creado",
+    "status_code_id": 1,
+    "created_at": "2023-11-29T21:38:20.000000Z"
+  }
+]
+```
+
+Mostrar Lote
+
+    Endpoint: /lote/{loteId}
+    Método: GET
+    Descripción: Obtiene detalles de un lote específico.
+    Parámetros:
+        loteId (Parámetro de ruta) - ID del lote.
+Respuesta:
+
+```json
+    {
+        "id": 1,
+        "user_id": 1,
+        "user_name": "Elza Hyatt Sr.",
+        "ubi": "test",
+        "observation": "test",
+        "status": "Se acaba de crear un lote, muy pronto se pasará Chubaca a por el!"
+    }
+```
+
+Almacenar Lote
+
+    Endpoint: /lote/
+    Método: POST
+    Descripción: Crea un nuevo lote.
+
+Cuerpo de la solicitud:
+
+```json
+
+{
+  "ubi":"testing",
+  "observation":"Es enorme",
+  "user_id":2
+}
+```
+
+Respuesta:
+
+```json
+
+ {
+  "ubi": "testing",
+  "observation": "Es enorme",
+  "user_id": 2,
+  "status_code_id": 1,
+  "created_at": "2023-11-29T21:42:45.000000Z",
+  "id": 5,
+  "status": "Se acaba de crear un lote, muy pronto se pasará Chubaca a por el!"
+}
+```
+
+Clasificar Lote
+
+    Endpoint: /lote/clasificador
+    Método: POST
+    Descripción: Clasifica un lote.
+
+Cuerpo de la solicitud:
+
+```json
+
+{
+    "id": ["1","3","4"],
+    "cantidad": ["2", "2", "2"],
+    "lote_id": 1,
+    "user_id": "1"
+}
+```
+
+Respuesta:
+
+```json
+
+{
+  "message": "Lote clasificado correctamente",
+  "despiece": {
+    "cantidad": "2",
+    "clasificador_id": "1",
+    "lote_id": 1,
+    "componente_id": "4",
+    "id": 4
+  }
+}
+```
+
+### Controlador de Clasificador
+
+Mostrar Lotes del Usuario
+
+    Endpoint: /user/{id}/lotes
+    Método: GET
+    Descripción: Obtiene la lista de lotes asociados a un usuario.
+    Parámetros:
+        id (Parámetro de ruta) - ID del usuario.
+
+Respuesta:
+
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "empresa": "Miss Irma Heathcote",
+    "ubi": "test23",
+    "observation": "test23",
+    "status": "Se acaba de crear un lote, muy pronto se pasará Chubaca a por el!",
+    "created_at": "2023-11-29T21:47:04.000000Z"
+  }
+]
+```
+
+Almacenar la asignación de un lote a un clasificador
+
+    Endpoint: /user/lote
+    Método: POST
+    Descripción: Asignar un lote a un usuario.
+
+Cuerpo de la solicitud:
+
+```json
+
+{
+    "lote_id": ["1","3"],
+    "user_id": 1,
+}
+```
+
+Esto asignará el lote 1 y 3 al clasificador, que tiene el id 1.
+
+Ejemplo de respuesta:
+
+```json
+{
+  "msg": "Asignado correctamente!",
+  "store": {
+    "user_id": 1,
+    "lote_id": [
+      "1",
+      "3"
+    ]
+  }
+}
+```
+
+Obtener Roles del Usuario
+
+    Endpoint: /user/{id}/mis-roles
+    Método: GET
+    Descripción: Obtiene los roles asociados a un usuario.
+    Parámetros:
+        id (Parámetro de ruta) - ID del usuario.
+
+Respuesta:
+
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "rol_id": 1
+  },
+  {
+    "id": 2,
+    "user_id": 1,
+    "rol_id": 1
+  },
+  {
+    "id": 3,
+    "user_id": 1,
+    "rol_id": 1
+  }
+]
+```
+
+## Controlador Compontes - NO FUNCIONAL
+
+Rutas de Componentes UNICO FUNCIONAL
+Obtener Componentes
+
+    Endpoint: /componentes/
+    Método: GET
+    Descripción: Obtiene la lista de componentes.
+
+Respuesta:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "CPU",
+    "desc": "Unidad Central de Procesamiento",
+    "is_hardware": 1,
+    "created_user_id": 1
+  },
+  {
+    "id": 2,
+    "name": "RAM",
+    "desc": "Memoria de Acceso Aleatorio",
+    "is_hardware": 1,
+    "created_user_id": 1
+  },
+  {
+    "id": 3,
+    "name": "GPU",
+    "desc": "Unidad de Procesamiento de Gráficos",
+    "is_hardware": 1,
+    "created_user_id": 1
+  },
+...
+]
+```
+
+Mostrar Componente
+
+    Endpoint: /componentes/{id}
+    Método: GET
+    Descripción: Obtiene detalles de un componente específico.
+    Parámetros:
+        id (Parámetro de ruta) - ID del componente.
+
+Respuesta:
+
+```json
+{
+    "id": 1,
+    "name": "CPU",
+    "desc": "Unidad Central de Procesamiento",
+    "is_hardware": 1,
+    "created_user_id": 1
+  }
+```
+
+Actualizar Componente
+
+    Endpoint: /componentes/{id}
+    Método: PUT
+    Descripción: Actualiza detalles de un componente específico.
+    Parámetros:
+        id (Parámetro de ruta) - ID del componente.
+
+PUT - Cuerpo de la solicitud:
+
+```json
+{
+    "id": 1,
+    "name": "CPU2",
+    "desc": "Unidad Central de Procesamiento2",
+    "is_hardware": 1,
+    "created_user_id": 1
+  }
+```
+
+Ejemplo de respuesta:
+
+```json
+{
+    "id": 1,
+    "name": "CPU2",
+    "desc": "Unidad Central de Procesamiento2",
+    "is_hardware": 1,
+    "created_user_id": 1
+  }
+```
+
+Devuelve el componente actualizado.
+
+Almacenar Componente
+
+    Endpoint: /componentes/
+    Método: POST
+    Descripción: Crea un nuevo componente.
+
+POST
+
+Cuerpo de la solicitud:
+
+```json
+{
+    "id": 6,
+    "name": "CPU5",
+    "desc": "Unidad Central de Procesamiento6",
+    "is_hardware": 1,
+    "created_user_id": 1
+}
+```
+
+Respuesta:
+
+```json
+{
+    "id": 6,
+    "name": "CPU5",
+    "desc": "Unidad Central de Procesamiento6",
+    "is_hardware": 1,
+    "created_user_id": 1
+}
+```
+

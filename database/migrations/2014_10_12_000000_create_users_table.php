@@ -14,11 +14,15 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('profile')->default("https://project-jawas.s3.eu-west-3.amazonaws.com/perfiles/QpjAQcQk1VjSEsu4QefNOWnZvZRShaU5zzNnX1YV.jpg");
+            $table->string('name_empresa')->unique();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->date('start_at');
+            $table->date('end_at')->nullable();
         });
     }
 

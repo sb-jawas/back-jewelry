@@ -32,6 +32,7 @@ class AuthController extends Controller
                 }
                     $success['token'] =  $auth->createToken('access_token',$roles)->plainTextToken;
                 $success['user_id'] =  $auth->id;
+                $success['user_name'] = $auth->name;
 
                 return response()->json($success, 200);
             }else{
@@ -78,9 +79,15 @@ class AuthController extends Controller
             "rol_id" => 1
         ];
 
-        $rolUser = RolUser::create($vecUserRol);
-        MailController::sendmail('welcome', $input['name'],$input['email'], ['username'=> $input['name'], 'email' => $input['email']],'Registro Jawlary');
-        return response()->json([ "user" => [$user, $rolUser], "msg" => "Usuario registrado", "status"=>200],200);
+        try{
+
+            $rolUser = RolUser::create($vecUserRol);
+            MailController::sendmail('welcome', $input['name'],$input['email'], ['username'=> $input['name'], 'email' => $input['email']],'Registro Jawlary');
+            return response()->json([ "user" => [$user, $rolUser], "msg" => "Usuario registrado", "status"=>200],200);
+        }catch(\Exception $exception){
+            return response()->json(["msg"=> $exception->getMessage() ], 500);
+
+        }
     }
 
     public function logout(String $userId, Request $request)

@@ -149,7 +149,7 @@ class ComponentesController extends Controller
             'componente_id' => 'exists:componentes,id',
             'name' => 'max:30',
             'desc' => 'max:255',
-            'is_hardware' => 'integer|between:0,1',
+            'is_hardware' => 'between:0,1',
         ], $message);
 
         if ($validator->fails()) {
@@ -162,26 +162,44 @@ class ComponentesController extends Controller
             if (!empty($isAdmin) || !empty($compByUser[0])) {
                 $componente = Componentes::where('id', $componenteId)->get();
 
-                $i = 0;
-                $vecDatos = ["name", "desc", "is_hardware"];
-                $t = $req->all();
-                $t["is_hardware"] = strval($t["is_hardware"]);
-                $size = count($t);
-                $arrVec = [];
-                while ($i < $size) {
-                    if ($t[$vecDatos[$i]] != null) {
-                        if ($vecDatos[$i] == "is_hardware") {
-                            $arrVec[$vecDatos[$i]] = intval($t[$vecDatos[$i]]);
-                        } else {
-                            $arrVec[$vecDatos[$i]] = $t[$vecDatos[$i]];
-                        }
-                    } else {
-                        $arrVec[$vecDatos[$i]] = $componente[0][$vecDatos[$i]];
-                    }
-                    $i++;
+                // $i = 0;
+                // $vecDatos = ["name", "desc", "is_hardware"];
+                // $t = $req->all();
+                // $t["is_hardware"] = strval($t["is_hardware"]);
+                // $size = count($t);
+                // $arrVec = [];
+                // while ($i < $size) {
+                //     if ($t[$vecDatos[$i]] != null) {
+                //         if ($vecDatos[$i] == "is_hardware") {
+                //             $arrVec[$vecDatos[$i]] = intval($t[$vecDatos[$i]]);
+                //         } else {
+                //             $arrVec[$vecDatos[$i]] = $t[$vecDatos[$i]];
+                //         }
+                //     } else {
+                //         $arrVec[$vecDatos[$i]] = $componente[0][$vecDatos[$i]];
+                //     }
+                //     $i++;
+                // }
+                $vecHard = [
+                    "is_hardware" => $req->get('is_hardware')
+                ];
+                $vecDesc = [
+                    "desc" => $req->get('desc')
+                ];
+                $vecName = [
+                    "name" => $req->get('name')
+                ];
+
+                if (!empty($req->get('name'))) {
+                    $componente = Componentes::find($componenteId)->update($vecName);
+                }
+                if (!empty($req->get('desc'))) {
+                    $componente = Componentes::find($componenteId)->update($vecDesc);
                 }
 
-                $componente = Componentes::find($componenteId)->update($arrVec);
+                if ($req->get('is_hardware') != null) {
+                    $componente = Componentes::find($componenteId)->update($vecHard);
+                }
 
                 $componente = Componentes::find($componenteId);
 

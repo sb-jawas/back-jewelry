@@ -30,8 +30,8 @@ Route::group(['middleware' => ['cors']], function () {
         Route::post('logout/{userId}', 'logout');
         Route::post('full-logout/{userId}', 'fullLogout');
     });
-    Route::post('signup/image', [UserUserController::class,'uploadImage']);
-    Route::post('forget-pass', [UserUserController::class,'forgetPass']);
+    Route::post('signup/image', [UserUserController::class, 'uploadImage']);
+    Route::post('forget-pass', [UserUserController::class, 'forgetPass']);
 
     Route::get('', function () {
         return response()->json("Unauthorized", 401);
@@ -40,16 +40,20 @@ Route::group(['middleware' => ['cors']], function () {
 
     Route::middleware('auth:sanctum')->group(function () {
 
-        Route::get('info-despiece/{loteId}', [ClasificadorController::class, 'infoDespiece']);
+        Route::get('colaborador/info-despiece/{loteId}', [ClasificadorController::class, 'infoDespiece'])->middleware('colaborador');
+        Route::get('clasificador/info-despiece/{loteId}', [ClasificadorController::class, 'infoDespiece'])->middleware('clasificador');
 
         Route::prefix('colaborador')->middleware('colaborador')->group(function () {
             Route::controller(ColaboradorController::class)->group(function () {
                 Route::get('{userId}/mis-lotes', 'index');
                 Route::get('{userId}/lote/{loteId}', 'show');
                 Route::post('lote', 'store');
-                Route::patch('lote/{loteId}', 'cancelar');
+                Route::put('lote/{loteId}/cancelar', 'cancelar');
             });
         });
+
+        Route::put('lote/{loteId}/rechazar', [ClasificadorController::class, 'rechazar'])->middleware('colaborador');
+
 
         Route::prefix('clasificador')->middleware('clasificador')->group(function () {
             Route::controller(ClasificadorController::class)->group(function () {
@@ -59,7 +63,6 @@ Route::group(['middleware' => ['cors']], function () {
                 Route::get('{userId}/mis-clasificados', 'clasificados');
                 Route::get('lote/{loteId}', 'show');
                 Route::post('{userId}/asign', 'store');
-                Route::patch('{loteId}/rechazar', 'rechazar');
                 Route::put('{loteId}/clasificar', 'clasificar');
             });
 
@@ -69,11 +72,20 @@ Route::group(['middleware' => ['cors']], function () {
             });
         });
 
-        Route::controller(ComponentesController::class)->middleware('designer')->group(function () {
-            Route::prefix("componentes")->group(function () {
+        Route::prefix('componentes')->middleware('clasificador')->group(function () {
+        Route::controller(ComponentesController::class)->group(function () {
                 Route::get('/', 'allComponentes');
                 Route::get('{componenteId}', 'show');
-                Route::patch('{componenteId}', 'update');
+                Route::put('{componenteId}', 'update');
+                Route::post('', 'store');
+                Route::delete('{componenteId}', 'destroy');
+            });
+        });
+        Route::prefix('admin/componentes')->middleware('admin')->group(function () {
+        Route::controller(ComponentesController::class)->group(function () {
+                Route::get('/', 'allComponentes');
+                Route::get('{componenteId}', 'show');
+                Route::put('{componenteId}', 'update');
                 Route::post('', 'store');
                 Route::delete('{componenteId}', 'destroy');
             });
@@ -93,7 +105,7 @@ Route::group(['middleware' => ['cors']], function () {
         // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         //     return $request->user();
         // });
-        
+
         Route::controller(UserUserController::class)->group(function () {
             Route::prefix('admin')->middleware('admin')->group(function () {
                 Route::get('/', 'index');
@@ -122,7 +134,7 @@ Route::group(['middleware' => ['cors']], function () {
                 });
             });
 
-            Route::post('/image','uploadImage');
+            Route::post('/image', 'uploadImage');
         });
     });
 });

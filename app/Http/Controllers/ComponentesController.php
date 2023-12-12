@@ -157,7 +157,7 @@ class ComponentesController extends Controller
         }
 
         $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?', [$req->get("user_id"), $componenteId]);
-        $isAdmin = DB::select('select rol_id from componentes inner join rol_has_user on componentes.created_user_id = rol_has_user.user_id where created_user_id = ? and rol_id = 4', [$req->get("user_id")]);
+        $isAdmin = DB::select('select rol_id from componentes inner join rol_has_user on componentes.created_user_id = rol_has_user.user_id where created_user_id = ? or rol_id = 4', [$req->get("user_id")]);
         try {
             if (!empty($isAdmin) || !empty($compByUser[0])) {
                 $componente = Componentes::where('id', $componenteId)->get();

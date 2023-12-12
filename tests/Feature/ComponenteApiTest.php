@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\RolUser;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -9,13 +11,31 @@ use Tests\TestCase;
 class ComponenteApiTest extends TestCase
 {
     /**
-     * A basic feature test example.
+     * A Testing componentes.
      */
     public function test_ComponenteApi()
     {
-        $response = $this->get('/api/componentes');
+        $user = User::factory()->create();
+        $rolUser = [
+            "user_id"=>$user->id,
+             "rol_id" =>2
+            ];
+        RolUser::create($rolUser);
 
-        $response->assertStatus(200)
+        $response = $this->post('/api/login', [
+            'email' => $user->email,
+            'password' => 'P@ssword123',
+        ]);
+
+        $response->assertStatus(200);
+
+        $token = $response->json('token');
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token,
+        ])->get('/api/componentes/1');
+
+       $response->assertStatus(200)
                  ->assertExactJson([
                      "id" => 1,
                      "name" => "CPU",

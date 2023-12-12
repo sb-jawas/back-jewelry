@@ -22,21 +22,22 @@ use Illuminate\Support\Str;
 class UserController extends Controller
 {
     //Roles de un usuario.
-    public function roles($userId){
-        $user = RolUser::where('user_id',$userId)->get();
-        
+    public function roles($userId)
+    {
+        $user = RolUser::where('user_id', $userId)->get();
+
         $rtnMsg = [];
         $sizeRoles = count($user);
-        
-        for ($i=0; $i <  $sizeRoles ; $i++) {
-            
+
+        for ($i = 0; $i <  $sizeRoles; $i++) {
+
             $rol = Rol::find($user[$i]->rol_id);
 
             array_push($rtnMsg, $rol);
         }
         $code = 202;
-        
-        return response()->json($rtnMsg,$code);
+
+        return response()->json($rtnMsg, $code);
     }
     /**
      * Para mostrar todos los usuarios.
@@ -63,7 +64,7 @@ class UserController extends Controller
             'end_at.date' => 'No es una fecha',
             'end_at.after' => 'La fecha tiene que ser mayor a la de hoy',
         ];
-    
+
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -71,32 +72,36 @@ class UserController extends Controller
             'start_at' => 'date',
             'end_at' => 'date|after:today',
         ], $messages);
-    
+
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
-        }
-    
-        $input = $request->all();
-        $randPass = Str::random(12);
-        $input['password'] = bcrypt($randPass);
-
-        if(empty($request->get('start_at'))){
-            $input['start_at'] = now();
+            return response()->json(["msg" => $validator->errors(), "status" => 400], 400);
         }
 
-        $user = User::create($input);
-        
-        if(empty($request->get('roles'))){
-            $vecUserRol = [
-                "user_id" => $user->id,
-                "rol_id" => 1
-            ];
-            RolUser::create($vecUserRol);
-        }else{
-            RolUser::create($request->get('roles'));
+        try {
+            $input = $request->all();
+            $randPass = Str::random(12);
+            $input['password'] = bcrypt($randPass);
+
+            if (empty($request->get('start_at'))) {
+                $input['start_at'] = now();
+            }
+
+            $user = User::create($input);
+
+            if (empty($request->get('roles'))) {
+                $vecUserRol = [
+                    "user_id" => $user->id,
+                    "rol_id" => 1
+                ];
+                RolUser::create($vecUserRol);
+            } else {
+                RolUser::create($request->get('roles'));
+            }
+
+            return response()->json(["msg" => "Usuario registrado", "status" => 200], 200);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
         }
-        
-        return response()->json(["msg" => "Usuario registrado", "status"=>200],200);
     }
 
     /**
@@ -112,21 +117,20 @@ class UserController extends Controller
                 'exists' => 'Este usuario no existe'
             ]
         ];
-    
+
         $validator = Validator::make($vecValidator, [
             'user_id' => 'exists:users,id',
         ], $messages);
-    
-        if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
-        }
-        
-        $user = User::find($userId);
-        $roles = DB::select('select rol.id,rol.name from rol inner join rol_has_user on rol.id = rol_has_user.rol_id where rol_has_user.user_id = ?',[$userId]);
-        $user->roles = $roles;
-        
-        return response()->json(["msg" => $user,"status"=>200], 200);
 
+        if ($validator->fails()) {
+            return response()->json(["msg" => $validator->errors(), "status" => 400], 400);
+        }
+
+        $user = User::find($userId);
+        $roles = DB::select('select rol.id,rol.name from rol inner join rol_has_user on rol.id = rol_has_user.rol_id where rol_has_user.user_id = ?', [$userId]);
+        $user->roles = $roles;
+
+        return response()->json(["msg" => $user, "status" => 200], 200);
     }
 
     /**
@@ -139,61 +143,72 @@ class UserController extends Controller
             'email.unique' => 'El email ya está registrado.',
             'name_empresa.unique' => 'El nombre de la empresa ya está en uso'
         ];
-    
+
         $validator = Validator::make($request->all(), [
             'email' => 'email|unique:users,email',
             'name_empresa' => 'unique:users,name_empresa',
         ], $messages);
-    
+
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+            return response()->json(["msg" => $validator->errors(), "status" => 400], 400);
         }
+        try {
 
-        $user = User::find($userId)->update($request->all());
+            $user = User::find($userId)->update($request->all());
 
-        $user = User::find($userId);
+            $user = User::find($userId);
 
-        return response()->json($user, 200);
-        
+            return response()->json($user, 200);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
+        }
     }
 
-    public function updateRoles(Request $request, String $userId){
+    public function updateRoles(Request $request, String $userId)
+    {
         $messages = [
             '*.rol_id.required' => 'Es necesario el rol',
             '*.rol_id.exists' => 'Este rol no existe'
         ];
-    
+
         $validator = Validator::make($request->all(), [
             '*.rol_id' => 'required|exists:rol,id',
         ], $messages);
-    
+
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+            return response()->json(["msg" => $validator->errors(), "status" => 400], 400);
         }
 
-        $user = RolUser::where('user_id',$userId)->delete();
+        $user = RolUser::where('user_id', $userId)->delete();
         $user = RolUser::insert($request->all());
-        
+
 
         $user = User::find($userId);
 
         return response()->json($user, 200);
     }
 
-    public function updateImage(Request $request, $userId){
-        $image = ImageController::cargarImagen($request,"perfiles");
-        if($image["msg"]){
-            User::find($userId)->update(["profile"=>$image["url"]]);
-            return response()->json($image, 200);
-        }else{
-            return response()->json($image["errors"], 400);
+    public function updateImage(Request $request, $userId)
+    {
+        try {
+
+            $image = ImageController::cargarImagen($request, "perfiles");
+            if ($image["msg"]) {
+                User::find($userId)->update(["profile" => $image["url"]]);
+                return response()->json($image, 200);
+            } else {
+                return response()->json($image["errors"], 400);
+            }
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
         }
     }
 
     /**
      * Eliminar usuario
      */
-    public function destroy(string $userId){
+    public function destroy(string $userId)
+    {
         $vecValidator = [
             "user_id" => $userId,
         ];
@@ -202,55 +217,68 @@ class UserController extends Controller
                 'exists' => 'Este usuario no existe'
             ]
         ];
-    
+
         $validator = Validator::make($vecValidator, [
             'user_id' => 'exists:users,id',
         ], $messages);
-    
+
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+            return response()->json(["msg" => $validator->errors(), "status" => 400], 400);
         }
-
-        User::destroy($userId);
-        return response()->json(["msg" => "Eliminado correctamente", "status"=>200], 200);
-
-    }
-
-    public function darBaja(string $userId){
-        $user = $this->bajaUser($userId, now());
-        if($user["msg"]){
-            return response()->json($user, 200);
-        }else{
-            return response()->json($user["errors"], 400);
+        try {
+            User::destroy($userId);
+            return response()->json(["msg" => "Eliminado correctamente", "status" => 200], 200);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
         }
     }
 
-    public function programBaja(Request $req, String $userId){
+    public function darBaja(string $userId)
+    {
+        try {
+            $user = $this->bajaUser($userId, now());
+            if ($user["msg"]) {
+                return response()->json($user, 200);
+            } else {
+                return response()->json($user["errors"], 400);
+            }
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
+        }
+    }
+
+    public function programBaja(Request $req, String $userId)
+    {
 
         $messages = [
             'user_id' => [
                 'exists' => 'Este usuario no existe'
             ]
         ];
-    
+
         $validator = Validator::make($req->all(), [
             'end_at' => 'date|after:today',
         ], $messages);
 
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+            return response()->json(["msg" => $validator->errors(), "status" => 400], 400);
         }
+        try {
 
-        $user = $this->bajaUser($userId, $req->get("end_at"));
-        if($user["msg"]){
-            return response()->json($user, 200);
-        }else{
-            return response()->json($user["errors"], 400);
+            $user = $this->bajaUser($userId, $req->get("end_at"));
+            if ($user["msg"]) {
+                return response()->json($user, 200);
+            } else {
+                return response()->json($user["errors"], 400);
+            }
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
         }
     }
 
 
-    public function bajaUser(String $userId, $date){
+    public function bajaUser(String $userId, $date)
+    {
         $vecValidator = [
             "user_id" => $userId,
         ];
@@ -259,26 +287,28 @@ class UserController extends Controller
                 'exists' => 'Este usuario no existe'
             ]
         ];
-    
+
         $validator = Validator::make($vecValidator, [
             'user_id' => 'exists:users,id',
         ], $messages);
-    
+
         if ($validator->fails()) {
             return $validator->errors();
         }
+        try {
+            $user = User::find($userId);
+            $user->end_at = $date;
+            $user->tokens()->delete();
+            $user->save();
 
-
-
-        $user = User::find($userId);
-        $user->end_at = $date;
-        $user->tokens()->delete();
-        $user->save();
-
-        return ["msg" => "Usuario dado de baja correctamente", "status"=>200];
+            return ["msg" => "Usuario dado de baja correctamente", "status" => 200];
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
+        }
     }
 
-    public function activeUser(String $userId){
+    public function activeUser(String $userId)
+    {
         $vecValidator = [
             "user_id" => $userId,
         ];
@@ -287,56 +317,68 @@ class UserController extends Controller
                 'exists' => 'Este usuario no existe'
             ]
         ];
-    
+
         $validator = Validator::make($vecValidator, [
             'user_id' => 'exists:users,id',
         ], $messages);
-    
+
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+            return response()->json(["msg" => $validator->errors(), "status" => 400], 400);
         }
-        
-        $user = User::find($userId);
-        $user->end_at = null;
-        
-        $user->save();
-        return response()->json(["msg" => "Usuario activado", "status"=>200], 200);
+        try {
+
+            $user = User::find($userId);
+            $user->end_at = null;
+
+            $user->save();
+            return response()->json(["msg" => "Usuario activado", "status" => 200], 200);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
+        }
     }
 
-    public function searchUserByEmail(Request $req){
+    public function searchUserByEmail(Request $req)
+    {
         $pattern = $req->get("email");
         $users = DB::table('users')->where('email', 'like', '%' . $pattern . '%')->get();
 
-        if(count($users)>=1){
+        if (count($users) >= 1) {
             return response()->json($users);
-        }else{
-            return response()->json("No se ha podido localizar este usuario",404);
-        }
-        
-    }
-
-    public function userLote(string $userId, string $loteId){
-        $user = User::find($userId);
-        $lote = Lote::where('user_id',$userId)->where('id',$loteId)->get();
-        return response()->json($lote);
-    }
-
-    public function userLotes(string $userId){
-        $user = User::find($userId);
-        $lote = Lote::where('user_id',$userId)->get();
-        return response()->json($lote);
-    }
-
-    public function uploadImage(Request $request){
-        $image = ImageController::cargarImagen($request,"perfiles");
-        if($image["msg"]){
-            return response()->json($image, 200);
-        }else{
-            return response()->json($image["errors"], 400);
+        } else {
+            return response()->json("No se ha podido localizar este usuario", 404);
         }
     }
 
-    public function forgetPass(Request $request){
+    public function userLote(string $userId, string $loteId)
+    {
+        $user = User::find($userId);
+        $lote = Lote::where('user_id', $userId)->where('id', $loteId)->get();
+        return response()->json($lote);
+    }
+
+    public function userLotes(string $userId)
+    {
+        $user = User::find($userId);
+        $lote = Lote::where('user_id', $userId)->get();
+        return response()->json($lote);
+    }
+
+    public function uploadImage(Request $request)
+    {
+        try {
+            $image = ImageController::cargarImagen($request, "perfiles");
+            if ($image["msg"]) {
+                return response()->json($image, 200);
+            } else {
+                return response()->json($image["errors"], 400);
+            }
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
+        }
+    }
+
+    public function forgetPass(Request $request)
+    {
         $email = $request->get('email');
         $vecValidator = [
             "email" => $email,
@@ -347,22 +389,26 @@ class UserController extends Controller
                 'exists' => 'Este usuario no existe'
             ]
         ];
-    
+
         $validator = Validator::make($vecValidator, [
             'email' => 'required|exists:users,email',
         ], $messages);
-    
+
         if ($validator->fails()) {
-            return response()->json(["msg" => $validator->errors(), "status"=>400], 400);
+            return response()->json(["msg" => $validator->errors(), "status" => 400], 400);
         }
         $idUser = User::where('email', $email)->get();
         $user = User::find($idUser[0]->id);
         $randPass = Str::random(12);
         $newPass['password'] = bcrypt($randPass);
 
-        MailController::sendmail('forget', $user['name'],$user['email'], ['username'=> $user['name'], 'password' => $randPass],'Recuperación de contraseña');
+        try {
 
-        $user->update($newPass);
-        return response()->json(["msg" => $randPass, "status"=>200], 200);
+            $user->update($newPass);
+            MailController::sendmail('forget', $user['name'], $user['email'], ['username' => $user['name'], 'password' => $randPass], 'Recuperación de contraseña');
+            return response()->json(["msg" => $randPass, "status" => 200], 200);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
+        }
     }
 }

@@ -64,8 +64,12 @@ class ComponentesController extends Controller
             return response()->json($validator->errors(), 404);
         }
 
-        $componente = Componentes::create($req->all());
-        return response()->json($componente);
+        try {
+            $componente = Componentes::create($req->all());
+            return response()->json($componente);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
+        }
     }
 
     /**
@@ -154,35 +158,39 @@ class ComponentesController extends Controller
 
         $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?', [$req->get("user_id"), $componenteId]);
         $isAdmin = DB::select('select rol_id from componentes inner join rol_has_user on componentes.created_user_id = rol_has_user.user_id where created_user_id = ? and rol_id = 4', [$req->get("user_id")]);
+        try {
+            if (!empty($isAdmin) || !empty($compByUser[0])) {
+                $componente = Componentes::where('id', $componenteId)->get();
 
-        if (!empty($isAdmin) || !empty($compByUser[0])) {
-            $componente = Componentes::where('id', $componenteId)->get();
-
-            $i = 0;
-            $vecDatos = ["name", "desc", "is_hardware"];
-            $t = $req->all();
-            $t["is_hardware"] = strval($t["is_hardware"]);
-            $size = count($t);
-            $arrVec = [];
-            while ($i < $size) {
-                if ($t[$vecDatos[$i]] != null) {
-                    if ($vecDatos[$i] == "is_hardware") {
-                        $arrVec[$vecDatos[$i]] = intval($t[$vecDatos[$i]]);
+                $i = 0;
+                $vecDatos = ["name", "desc", "is_hardware"];
+                $t = $req->all();
+                $t["is_hardware"] = strval($t["is_hardware"]);
+                $size = count($t);
+                $arrVec = [];
+                while ($i < $size) {
+                    if ($t[$vecDatos[$i]] != null) {
+                        if ($vecDatos[$i] == "is_hardware") {
+                            $arrVec[$vecDatos[$i]] = intval($t[$vecDatos[$i]]);
+                        } else {
+                            $arrVec[$vecDatos[$i]] = $t[$vecDatos[$i]];
+                        }
                     } else {
-                        $arrVec[$vecDatos[$i]] = $t[$vecDatos[$i]];
+                        $arrVec[$vecDatos[$i]] = $componente[0][$vecDatos[$i]];
                     }
-                } else {
-                    $arrVec[$vecDatos[$i]] = $componente[0][$vecDatos[$i]];
+                    $i++;
                 }
-                $i++;
+
+                $componente = Componentes::find($componenteId)->update($arrVec);
+
+                $componente = Componentes::find($componenteId);
+
+                return response()->json($componente, 200);
+            } else {
+                return response()->json(["msg" => "Este componente no te pertenece"], 404);
             }
-            $componente = Componentes::find($componenteId)->update($arrVec);
-
-            $componente = Componentes::find($componenteId);
-
-            return response()->json($componente, 200);
-        } else {
-            return response()->json(["msg" => "Este componente no te pertenece"], 404);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
         }
     }
 
@@ -217,12 +225,15 @@ class ComponentesController extends Controller
 
         $compByUser = DB::select('select id from componentes where created_user_id = ? and id = ?', [$req->get("user_id"), $componenteId]);
         $isAdmin = DB::select('select rol_id from componentes inner join rol_has_user on componentes.created_user_id = rol_has_user.user_id where created_user_id = ? and rol_id = 4', [$req->get("user_id")]);
-
-        if (!empty($isAdmin) || !empty($compByUser[0])) {
-            Componentes::destroy($componenteId);
-            return response()->json(["msg" => "Componente eliminado correctamente"], 200);
-        } else {
-            return response()->json(["msg" => "Este componente no te pertenece"], 404);
+        try {
+            if (!empty($isAdmin) || !empty($compByUser[0])) {
+                Componentes::destroy($componenteId);
+                return response()->json(["msg" => "Componente eliminado correctamente"], 200);
+            } else {
+                return response()->json(["msg" => "Este componente no te pertenece"], 404);
+            }
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
         }
     }
 

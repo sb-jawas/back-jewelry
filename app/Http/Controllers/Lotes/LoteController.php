@@ -33,33 +33,36 @@ class LoteController extends Controller
         }
         // $lotes = DB::select("SELECT lote.id, lote.ubi, lote.observation, lote.user_id, lote.status_code_id, lote.created_at FROM lote inner JOIN lote_has_user ON lote.id = lote_has_user.lote_id where lote_has_user.user_id = ? and status_code_id = 2 GROUP by id",[$userId]);
         $lotes = Lote::where("user_id", $userId)->get();
-        // dd($lotes);
 
         $rtnMsg = [];
         $i = 0;
+        try {
 
-        while ($i < count($lotes)) {
+            while ($i < count($lotes)) {
 
-            $status = StatusCode::find($lotes[$i]->status_code_id);
-            $user = User::find($lotes[$i]->user_id);
+                $status = StatusCode::find($lotes[$i]->status_code_id);
+                $user = User::find($lotes[$i]->user_id);
 
-            $arr = [
-                "id" => $lotes[$i]->id,
-                "lat" => $lotes[$i]->lat,
-                "long" => $lotes[$i]->long,
-                "observation" => $lotes[$i]->observation,
-                "empresa" => $user->name_empresa,
-                "status" => $status->name,
-                "status_code_id" => $status->id,
-                "created_at" => $lotes[$i]->created_at
-            ];
+                $arr = [
+                    "id" => $lotes[$i]->id,
+                    "lat" => $lotes[$i]->lat,
+                    "long" => $lotes[$i]->long,
+                    "observation" => $lotes[$i]->observation,
+                    "empresa" => $user->name_empresa,
+                    "status" => $status->name,
+                    "status_code_id" => $status->id,
+                    "created_at" => $lotes[$i]->created_at
+                ];
 
-            $rtnMsg[] = $arr;
-            $i++;
+                $rtnMsg[] = $arr;
+                $i++;
+            }
+
+
+            return response()->json($rtnMsg);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
         }
-
-
-        return response()->json($rtnMsg);
     }
 
     /**
@@ -67,17 +70,21 @@ class LoteController extends Controller
      */
     static function store(Request $req)
     {
-        $lote = new Lote;
-        $lote->lat = $req->get("ubi")[0];
-        $lote->long = $req->get("ubi")[1];
-        $lote->observation = $req->get("observation");
-        $lote->user_id = $req->get("user_id");
-        $lote->status_code_id = 1;
-        $lote->save();
+        try {
+            $lote = new Lote;
+            $lote->lat = $req->get("ubi")[0];
+            $lote->long = $req->get("ubi")[1];
+            $lote->observation = $req->get("observation");
+            $lote->user_id = $req->get("user_id");
+            $lote->status_code_id = 1;
+            $lote->save();
 
-        $lote->status = StatusCode::find($lote->status_code_id)->desc;
+            $lote->status = StatusCode::find($lote->status_code_id)->desc;
 
-        return $lote;
+            return $lote;
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
+        }
     }
 
     /**
@@ -164,23 +171,26 @@ class LoteController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-        $lote = Lote::find($req->get("lote_id"));
+        try {
+            $lote = Lote::find($req->get("lote_id"));
 
-        $check = true;
-        if ($lote->user_id == $userId) {
-            $check = false;
+            $check = true;
+            if ($lote->user_id == $userId) {
+                $check = false;
+            }
+            if ($check) {
+                $rtnObj = ["msg" => "No es posible cancelar un lote que no ha creado"];
+
+                return response()->json($rtnObj, 404);
+            }
+
+            $lote->status_code_id = 7;
+
+            $lote->save();
+
+            return response()->json($lote, 200);
+        } catch (\Exception $exception) {
+            return response()->json(["msg" => $exception->getMessage()], 500);
         }
-        if ($check) {
-            $rtnObj = ["msg" => "No es posible cancelar un lote que no ha creado"];
-
-            return response()->json($rtnObj, 404);
-        }
-
-        $lote->status_code_id = 7;
-        // $lote->observation = "actualizado";
-        $lote->save();
-
-        return response()->json($lote, 200);
     }
-
 }

@@ -12,8 +12,8 @@ class MailController extends Controller
     {
          Mail::send($vista, $data,function($message) use ($email, $username, $asunto)
         {
-            $message->to($email)->subject('Jawalry te da la bienvenida '.$username.'!');
-            $message->from('b.hamidou@badrweb.es', $asunto);
+            $message->to($email)->subject($asunto.' ' .$username);
+            $message->from('b.hamidou@badrweb.es', 'Jawalry');
         });
 
         return response()->json(["enviado" => true],200);
